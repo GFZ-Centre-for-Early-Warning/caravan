@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="320"
+   height="80"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="banner.svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient5314">
+      <stop
+         style="stop-color:#1d0000;stop-opacity:0.23529412;"
+         offset="0"
+         id="stop5316" />
+      <stop
+         id="stop3783"
+         offset="0.37307513"
+         style="stop-color:#1d0000;stop-opacity:0.09803922;" />
+      <stop
+         style="stop-color:#1d0000;stop-opacity:0;"
+         offset="1"
+         id="stop5318" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3872"
+       osb:paint="gradient">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3874" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3876" />
+    </linearGradient>
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect3023"
+       is_visible="true" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect3017"
+       is_visible="true" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect3023-0"
+       is_visible="true" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect3023-0-5"
+       is_visible="true" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5314"
+       id="linearGradient5322"
+       x1="151.72221"
+       y1="-1027.8186"
+       x2="152.01642"
+       y2="-1050.5039"
+       gradientUnits="userSpaceOnUse"
+       spreadMethod="pad"
+       gradientTransform="translate(0,10)" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3"
+     inkscape:cx="63.137909"
+     inkscape:cy="48.701373"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     width="300px"
+     inkscape:object-nodes="true"
+     inkscape:window-width="1600"
+     inkscape:window-height="899"
+     inkscape:window-x="316"
+     inkscape:window-y="34"
+     inkscape:window-maximized="0"
+     objecttolerance="11" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-972.36199)">
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:URW Gothic L;-inkscape-font-specification:URW Gothic L Semi-Bold"
+       x="53"
+       y="1017.8621"
+       id="text2987"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan2989"
+         x="53"
+         y="1017.8621"
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-family:URW Gothic L;-inkscape-font-specification:URW Gothic L Semi-Bold">caravan</tspan></text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot2991"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       transform="translate(6,976.36199)"><flowRegion
+         id="flowRegion2993"><rect
+           id="rect2995"
+           width="16.428572"
+           height="79.285713"
+           x="23.571428"
+           y="76.428574" /></flowRegion><flowPara
+         id="flowPara2997" /></flowRoot>    <text
+       xml:space="preserve"
+       style="font-size:14px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:end;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#000000;fill-opacity:1;stroke:none;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Medium"
+       x="316"
+       y="984.362"
+       id="text2999"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         x="316"
+         y="984.362"
+         id="tspan3013"
+         style="font-size:14px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:end;text-anchor:end;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Medium">Central Asia Risk and Vulnerability</tspan><tspan
+         sodipodi:role="line"
+         x="316"
+         y="1001.862"
+         id="tspan3005"
+         style="font-size:14px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:end;text-anchor:end;font-family:Ubuntu;-inkscape-font-specification:Ubuntu Medium">Analysis Tool</tspan></text>
+    <path
+       style="fill:#ca0000;fill-opacity:1;stroke:none;"
+       d="m 62,991.86168 c -10.42959,0 -18.884443,8.20812 -18.884443,18.33322 0,10.1253 8.454853,18.3334 18.884443,18.3334 0.175597,0 0.347361,-0.021 0.521807,-0.026 -9.661319,-0.2576 -17.418414,-8.3452 -17.418414,-18.3078 0,-9.954 7.743806,-18.03681 17.393566,-18.30782 -0.166839,-0.004 -0.329123,-0.0254 -0.496959,-0.0254 z"
+       id="path4172"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#ca0000;fill-opacity:1;stroke:none"
+       d="m 50.300122,980.98332 c -14.729068,0 -26.669335,13.43848 -26.669335,30.01568 0,16.5772 11.940267,30.0157 26.669335,30.0157 0.247984,0 0.490555,-0.034 0.736915,-0.042 -13.644085,-0.4221 -24.598952,-13.663 -24.598952,-29.974 0,-16.29702 10.936099,-29.5303 24.563861,-29.97401 -0.235617,-0.007 -0.4648,-0.0416 -0.701824,-0.0416 z"
+       id="path4172-8"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#ca0000;fill-opacity:1;stroke:none"
+       d="m 30.388233,973.19513 c -14.818639,0 -26.83152,17.24902 -26.83152,38.52677 0,21.2778 12.012881,38.5268 26.83152,38.5268 0.249492,0 0.493539,-0.044 0.741397,-0.053 -13.727059,-0.5417 -24.7485465,-17.5372 -24.7485465,-38.4733 0,-20.91809 11.0026045,-37.90372 24.7132415,-38.47327 -0.237049,-0.0101 -0.467626,-0.0534 -0.706092,-0.0534 z"
+       id="path4172-8-1"
+       inkscape:connector-curvature="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:url(#linearGradient5322);fill-opacity:1;fill-rule:nonzero;stroke:none;font-family:URW Gothic L;-inkscape-font-specification:URW Gothic L Semi-Bold"
+       x="53"
+       y="-1017.8621"
+       id="text2987-4"
+       sodipodi:linespacing="125%"
+       transform="scale(1,-1)"><tspan
+         sodipodi:role="line"
+         id="tspan2989-9"
+         x="53"
+         y="-1017.8621"
+         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;fill:url(#linearGradient5322);fill-opacity:1;fill-rule:nonzero;font-family:URW Gothic L;-inkscape-font-specification:URW Gothic L Semi-Bold">caravan</tspan></text>
+  </g>
+</svg>

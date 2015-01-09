@@ -1,0 +1,652 @@
+/**
+* Caravan css stylesheet controlling the layout of the page.
+* In principle, all css properties  
+* in (float,position, display, top, right,bottom,left, overflow)
+* There might be other properties (e.g., div background-color:white) which need to be set 
+* in order to provide a "base" appearence. They can be overridden in skin.css
+*
+*    Created on : Jul 17, 2014, 5:35:25 PM
+*    Author     : Riccardo Zaccarelli, PhD (<riccardo(at)gfz-potsdam.de>, <riccardo.zaccarelli(at)gmail.com>)
+*/
+
+/*LAYOUT: PLEASE DO NOT CHANGE*/
+
+html{ 
+    height:100%; /*necessary for contained divs heights to properly work*/
+    padding:0; /*for safety, so that 100% width (or height) DOES work as expected*/
+    margin:0; /*for safety, so that 100% width (or height) DOES work as expected*/
+}
+
+body{
+    height:100%; /*necessary for contained divs heights to properly work*/
+    padding:0; /*for safety, so that 100% width (or height) DOES work as expected*/
+    margin:0; /*for safety, so that 100% width (or height) DOES work as expected*/
+}
+
+/*----------------------------------
+HORIZONTAL LAYOUT:
+
+This sets VERTICAL panels. Left and right divs widths are auto (i.e., according to the content. Note that if the content is floated or abolutely positioned, 
+i.e. in any case the content is removed from the normal flow, then the width might be zero), the central panel stretches the remaining parent width.
+The layout is the following, NOTE THAT layout-right MUST be placed BEFORE layout center:
+<div class=layout-left></div>
+<div class=layout-right></div>
+<div class=layout-center></div>
+
+<div class=h-layout-left>
+    <div class=h-wrapper>
+        ...content...(whatever)...
+    </div>
+</div>
+<div class=h-layout-right>
+    <div class=h-wrapper>
+        <div>
+            ...content...(whatever)...
+        </div>
+    </div>
+</div>
+<div class=h-layout-center>
+    <div class=h-wrapper>
+        ...content...(whatever)...
+    </div>
+</div>
+
+You can delete EITHER left or right, if you want a two column layout. In both cases, center will stretch the available width
+
+Notes: called the three divs above Ds
+
+1) Ds parent (if Ds are appended to the body, then it is the body AND the html) must have a css height SET.
+2) left and right divs MUST have divs without positions absolute or float set, otherwise they run out the normal flow and the parent divs have width=0
+3) Margins cannot be set ON the CENTRAL container. Or better, it can be set but won't show up cause margin does not apply to floated adjacent elements, 
+which are removed from the document flow. If you need margins, either give them to children divs, or use padding on "layout-..."" divs 
+(see http://reference.sitepoint.com/css/margin-top)
+4) the h-wrapper divs can be used to set padding on them, so to simulate margins for the contained div's (if any)
+----------------------------------*/
+
+div.h-layout-left, div.h-layout-center, div.h-layout-right {
+    height:100%;
+}
+
+div.h-layout-center {
+    overflow:hidden; /*FUNDAMENTAL TO STRETCH THE WHOLE WIDTH!! See http://stackoverflow.com/questions/1260122/expand-div-to-take-remaining-width*/
+    /*see also: http://colinaarts.com/articles/the-magic-of-overflow-hidden/ */
+}
+
+div.h-layout-left {
+    float:left; /*float left seems to set width to auto (take it accoridng to content). Needs ref*/
+}
+
+div.h-layout-right {
+    float:right; /*float left seems to set width to auto (take it accoridng to content). Needs ref*/
+}
+
+div.h-wrapper, div.h-wrapper > div{
+    height:100%;
+    box-sizing:border-box;
+}
+
+div.h-layout-center > div.h-wrapper{
+    width:100%;
+}
+
+/*----------------------------------
+VERTICAL LAYOUT:
+Note: display:table and dubdivs as table-row, table-cell NOT consistent across browser (Chrome and FF)
+So we use a layout with absolutely positioned top and bottom
+
+<div class=v-layout > <!--add css classes v-no-top and/or v-no-bottom if top and bottom are missing, repsecively-->
+    <div class=v-wrapper>
+        <div class=v-layout-top >
+            ... content...
+        </div>    
+        <div class=v-layout-center >
+             ...content... 
+        </div>
+        <div class=v-layout-bottom>
+                ...content... 
+        </div>
+    </div>    
+</div>
+
+Notes: called the three divs above Ds
+
+1) Ds parent (if Ds are appended to the body, then it is the body AND the html) must have a css height SET.
+2) the v-wrapper divs can be used to set padding on them, so to simulate margins for the contained div's (if any)
+3) v-layout-center v-wrapper MUST have another div (its style is overflow auto and height:100%)
+4) If you don't have top, you need to add v-no-top class to .v-layout, if you don't have bottom, v-no-bottom
+See this link which explains that we cannot do enything nicer:
+http://stackoverflow.com/questions/3096239/how-to-select-an-html-element-according-to-its-child-node-attribute-in-css
+----------------------------------*/
+
+div.v-layout, div.v-layout div{
+    box-sizing:border-box;
+}
+
+div.v-layout > div.v-wrapper{
+    position:relative;/*for displaying absolutely positioned divs relative to this div (top and bottom)*/
+}
+
+div.v-layout-bottom, div.v-layout-top{
+    position:absolute;
+    width:100%; /*refers to v-wrapper width, as its position is relative. Css is a mess, it works like this.
+                See (if you're brave): http://www.w3.org/TR/CSS2/visudet.html */
+}
+
+div.v-layout-bottom{
+    bottom:0;
+}
+
+div.v-layout-top{
+    top:0;
+}
+
+div.v-layout, div.v-layout-center, div.v-layout-top, div.v-layout-bottom, div.v-wrapper /*, div.v-wrapper > div*/{
+    height:100%;
+}
+
+div.v-layout div.v-layout-center /*div.v-wrapper > div*/{
+    overflow:auto;
+}
+
+/*setting paddings and margins*/
+div.v-layout:not(.v-no-bottom) > div.v-wrapper{
+    padding-bottom:3em;
+}
+div.v-layout-bottom{
+    height:3em;
+}
+div.v-layout:not(.v-no-top) > div.v-wrapper{
+    padding-top:5.5em; /*change this and the caravan image height below (4em)*/
+}
+div.v-layout-top{
+    height:5.5em;
+}
+div.toolbar{
+	position: absolute;
+	top: 3.5em; /*set according to padding-top above*/
+	right: 0;
+}
+/*caravan image*/
+div.v-layout.banner{ 
+    background-image: url(../imgs/banner.svg);background-size: auto 4em;background-position: left 2px;background-repeat: no-repeat;
+}
+/*end setting paddings and margins*/
+
+.toolbar a, .toolbar input, .toolbar button{
+	border-radius: 5px;
+	display: inline-block;
+}
+
+.toolbar a:not(:FIRST-CHILD), .toolbar input:not(:FIRST-CHILD), .toolbar button:not(:FIRST-CHILD){
+	margin-left: 4px;
+}
+
+input[type="button"], input[type="submit"], input[type="reset"], 
+input[type="file"]::-webkit-file-upload-button, 
+button, select, .myButton{
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+/*END-OF LAYOUT*/
+
+/*make elements of this class not selectable, e.g., labels wrapping a checkbox (for which a click should not 
+select any text).
+See http://aleembawany.com/2009/01/20/disable-selction-on-menu-items-with-this-jquery-extension/
+*/
+.notSelectable{
+    user-select: none; 
+    -o-user-select: none; 
+    -moz-user-select: none; 
+    -khtml-user-select: none; 
+    -webkit-user-select: none; 
+}
+
+/*inherit font-family for buttons textareas and inputs*/
+input,select,textarea,button{
+    font-family: inherit;
+}
+
+#map{
+    /*    background-color: #ff0;*/
+    width:100%;
+    height:100%;
+}
+
+/*controls stuff (bootstrap.css)*/
+button,input,select,textarea{
+    margin:0;font-size:100%;vertical-align:middle
+}
+
+/*button stuff (bootstrap.css)*/
+button,input{
+    *overflow:visible;line-height:normal
+}
+button::-moz-focus-inner,input::-moz-focus-inner{
+    padding:0;border:0
+}
+button,input[type="button"],input[type="reset"],input[type="submit"]{
+    cursor:pointer;-webkit-appearance:button
+}
+
+.title>span{
+    display: inline-block;
+}
+
+a > img, #_qe_container img{
+    vertical-align:middle; 
+    height:1.5em;
+}
+
+.warning > img{
+    height: 1.5em;
+    width: auto;
+    margin-right: 0.5em;
+}
+
+a > img, button > img, #_qe_container img{
+    vertical-align: middle;
+    height: 1.3em;
+    width: auto;
+}
+
+a.imgright > img, button.imgright > img{
+    float: right;
+    margin-left: 0.5em;
+    margin-right: 0em;
+}
+
+a.imgleft > img, button.imgleft > img{
+    float: left;
+    margin-left: 0em;
+    margin-right: 0.5em;
+}
+
+
+/*align form elements. See http://stackoverflow.com/questions/895904/select-inputs-and-text-inputs-in-html-best-way-to-make-equal-width*/
+/*It does NOT seem to work with buttons*/
+div.skinnable-panel input, div.skinnable-panel select, div.skinnable-panel textarea, div.skinnable-panel button {
+    /*div.params input, div.params select, div.params textarea, div.params button {*/
+
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+
+div.input-params{
+    text-align:right;
+}
+div.input-params input{
+    text-align:right; /*not inherited*/
+}
+
+div.event_params > div:not(.title) > *, div.model_params > div:not(.title) > *{
+    display: inline-block;
+    width:auto;
+}
+div.event_params > div:not(.title) > *:last-child, div.model_params > div:not(.title) > *:last-child{
+    width: 9.5em;
+}
+div.title{
+    text-align:left;
+}
+
+/*copied from bootsrap.css*/
+html{
+    font-size:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%
+}
+a{
+    text-decoration:none
+}
+a:hover, a:visited{
+    text-decoration:underline
+}
+
+
+/*needs divs white (for the popup at least). This property will be probably overridden by skin.css*/
+div{
+    background-color: white;
+}
+/*checkboxes layout problem*/
+input[type="checkbox"]{
+    position:relative;
+    top:-2px;
+    margin-right: 4px;
+}
+
+/*inputs widths inside td's behave differently: FF, they span the available width, chrome, they do the same if width:100% (in FF width 100% overflows the cell. 
+Maybe it is interpreted as 100% of the available input width?).
+Anyway, from here: http://stackoverflow.com/questions/13856955/i-need-to-make-an-input-element-adjust-to-table-cell-width
+this seems to solve the problem:*/
+
+/*td > input, th > input, td > select, th > select  {
+     width:100%;
+}*/
+
+/*Chrome + Safari only (see http://stackoverflow.com/questions/9328832/how-to-apply-specific-css-rules-to-chrome-only):*/
+/*@media screen and (-webkit-min-device-pixel-ratio:0) { 
+    td > input, th > input, td > select, th > select  {
+        width:100%;
+    }
+}*/
+
+/*Firefox only (see http://stackoverflow.com/questions/952861/targeting-only-firefox-with-css):*/
+/*@-moz-document url-prefix() {
+   
+}*/
+
+div.mapWaiter{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    z-index: 10;
+    text-align: center;
+    font-size: 150%;
+    padding: 1em;
+    background-color: rgba(0,0,0,0.1);
+    text-shadow: 2px 2px 2px white;
+}
+
+.waiting{
+    background: url(../imgs/wait-bar.gif) 50% 50% no-repeat;
+}
+
+#run_button{
+    width:100%;
+}
+
+.warning{
+    color: #0000CD; /*mediumblue*/
+}
+
+/*TO BE REMOVED*/
+#_qe_container{height:100%; width:100%;margin-right:3%;margin-bottom:5%;margin-top:0;margin-left:0;}
+
+#_qe_left_bottom, #_qe_right_bottom{
+    text-align: right
+}
+#_qe_result_table{
+    overflow: hidden; /*this property is set to auto by the layout, needs to be set to hidden*/
+}
+
+#_qe_table_query{
+    border-spacing: 0;
+    border-collapse: collapse;
+    /*this is for showing scrollbars automatically. Note that the table is inside a v-layout which is inside an h-layout, so 
+    there are tons of dependancies to check. Better not to modify these lines*/
+    display:block; /*behaves like a div. In chrome this is essential*/
+    height:100%; /*take 100% of the available height (minus container padding, if any)*/
+    overflow: auto; 
+    box-sizing: border-box; /*in case we add borders and padding, consider them in the size set above*/
+}
+
+#_qe_table_query td{
+    padding:0;
+}
+/*#_qe_table_query select, */
+#_qe_table_query input:not([type="checkbox"]){
+    width:9em; /*100%;*/
+}
+
+/*special cases: dates:*/
+#_qe_container input.date-year{width:4.2em;}
+#_qe_container input.date-month, #_qe_container input.date-day{width:2.9em;}
+
+
+/*TABLE FDSN EVENT QUERY====================================================*/
+
+iframe.fdsn_frame{
+	height: 100%;
+	width: 100%;
+ 	border: 0;
+ 	padding: 0;
+ 	margin: 0;
+	box-sizing: border-box;
+}
+
+table.fdsn{ 
+ 	width: 100%; 
+}
+
+table.fdsn thead tr{
+	height:2.5em;
+}
+table.fdsn thead, table.fdsn tbody{
+	display: block;	
+}
+table.fdsn tbody{
+	overflow: hidden;
+	overflow-y: auto;
+}
+
+table.fdsn tr{
+	margin: 0;
+	padding: 0;
+}
+table.fdsn td{
+	margin: 0; /*should be unuseful, for safety*/
+}
+table.fdsn td{
+	padding-left: 7px;
+	padding-right: 7px;  
+}
+table.fdsn tbody td{
+	padding-top: 5px;
+	padding-bottom: 5px; 
+    text-align:right;
+}
+
+table.fdsn thead td{
+	position: relative;
+}
+table.fdsn thead a{
+	position: absolute;
+	top:5px;
+	bottom: 5px;
+	left: 5px;
+	right: 5px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	background-size: auto 0.75em;
+	background-position: center bottom;
+	background-repeat: no-repeat
+}
+
+table.fdsn, table.fdsn thead, table.fdsn tbody, table.fdsn td, table.fdsn tr{
+	box-sizing: border-box;
+}
+
+/*TABLE FDSN EVENT QUERY====================================================*/
+
+/*languages div*/
+div.languages a{
+	display:block;
+}
+/*languages div*/
+
+/*SIMULATION DIVS. Check function toggleRun defined (temprarily?) in caravanevent.js)*/
+
+#simulation-panel, #pbar-inner-container{
+	position: relative; 
+	width: 100%; 
+	height: 100%;
+}
+
+.simulation-msgs{
+    position: absolute;
+    box-sizing: border-box;
+    top:0;
+    /*    left:0;
+        right:0;*/
+    bottom:4em;
+    /*background:black;
+    color:#E9EEFF;*/
+    width:100%;
+    overflow:auto;
+}
+.simulation-msgs > span{
+    display:block;
+    /*word-wrap: break-word; */
+    margin-bottom: 0.7em;
+}
+.error{
+    color: #ef2312;
+    font-weight: 900;
+    /*text-decoration: underline;*/
+    text-shadow: 0px 0px 10px rgba(255,255,255,0.4);
+    font-size: 120%;
+}
+
+
+.pbar-container{
+    position: absolute;
+    box-sizing: border-box;
+    bottom:0;
+    height:3em;
+    border:1px solid black;
+    background: white;
+    margin-top:1em;
+    width:100%;
+}
+/* moved up (see simulation-panel):*/
+/* #pbar-inner-container{ */
+/* 	position: relative;  */
+/* 	height: 100%;  */
+/* 	width: 100%; */
+/* } */
+.pbar{
+    background: blue;
+    width:0%;
+}
+.pbar-text{
+    width:100%;
+    z-index:10;
+    text-align: center;
+    text-overflow: ellipsis;
+    text-shadow: 1px 1px 2px rgba(100,100,100, 0.3);
+    /*text-shadow: 0px 1px 0px #dddddd;  #154682; */
+    /*font-size: 90%;
+    font-weight: bold;*/
+    color: #111; /*darker than body*/
+}
+.pbar, .pbar-text{
+    position: absolute;
+    box-sizing: border-box;
+    height:100%;
+}
+
+
+/*PLOT STUFF*/
+.plotContainer{
+    display: inline-block;
+    position: absolute;
+    z-index: 10; 
+    left: 4em; 
+    top: 1em;
+    padding:0;
+}
+
+.plot{
+    position: relative;
+    width:200px;
+    height:150px;
+    overflow:hidden;
+}
+
+/*from //see example on http://stackoverflow.com/questions/13817403/title-for-x-and-y-axis-in-flot-graph:*/
+.axisLabel {
+    /*    position: absolute;*/
+    text-align: center;
+    font-size: 12px;
+}
+
+.xaxisLabel {
+    bottom: 0px;
+    left: 0;
+    right: 0;
+}
+
+.yaxisLabel {
+    -webkit-transform-origin: right bottom;
+    -webkit-transform: rotate(-90deg);
+    float:left;
+    /*height:100%; does not work cause the parent has no height set!*/
+    /*    top: 50%;
+        left: 2px;
+        transform: rotate(-90deg);
+        -o-transform: rotate(-90deg);
+        -ms-transform: rotate(-90deg);
+        -moz-transform: rotate(-90deg);
+        -webkit-transform:  rotate(-90deg);
+        transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        -ms-transform-origin: 0 0;
+        -moz-transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;*/
+}
+
+/*LEGEND AND RELATED STUFF*/
+#legend-container, #leaflet-layer-switcher-toggler{
+	display:inline-block;
+	box-sizing: border-box;
+}
+#leaflet-layer-switcher-toggler{
+	float: right;
+}
+
+#leaflet-layer-switcher > *{
+	display:block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#leaflet-show_layers{ /*override leaflet default*/
+	width: 1em;
+}
+
+#leaflet-show_layers img{
+	width: 0.9em;
+	height:auto;
+	margin:0;
+}
+
+#legend-container table{
+	border-collapse: collapse;       		
+}
+
+#legend-container td{
+	height: 1.3em;
+	min-width:1em;
+	vertical-align: bottom;
+	padding: 3px;
+	padding-bottom: 0;
+	padding-left: 1px;
+}
+
+#legend-container *[data-title]{
+	font-weight:bold;
+	display:inline-block;
+	margin-bottom:3px;
+}
+#legend-container td.legend-label{
+	border-left: 1px solid #ccc; /*rgba(0, 0, 0, 0.2 );*/
+}
+#leaflet-layer-switcher{
+	border-top: 1px solid #ccc; /*rgba(0, 0, 0, 0.2 );*/
+}
+
+#leaflet-control{
+	background-color:white;
+	padding: 5px;
+	padding-left: 10px; /*visually, it is better iof left padding increases*/
+}
+#legend-container{
+	margin-right: 10px;
+}
+#leaflet-layer-switcher{
+	margin-top: 8px;
+	padding-top: 5px;
+}

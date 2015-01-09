@@ -1,0 +1,355 @@
+/** 
+ * Caravan css stylesheet controlling the aspect and appearence. In principle, all css properties NOT 
+ * in (float,position, display, top, right,bottom,left, overflow)
+ *   Created on : Jul 17, 2014, 5:36:51 PM
+ *   Author     : Riccardo Zaccarelli, PhD (<riccardo(at)gfz-potsdam.de>, <riccardo.zaccarelli(at)gmail.com>)
+ */
+
+body{
+    font-size:14px;
+    line-height:20px;
+    background-color:#fff;
+    color: #333;
+    
+    font-family: Ubuntu, "Helvetica Neue", Helvetica, Arial, sans-serif; /*"Proxima Nova Regular","Segoe UI",Roboto,"Droid Sans","Helvetica Neue",Arial,sans-serif;*/
+    /*font-family: 'Ubuntu Mono', 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', 'Monaco', 'Courier New';*/
+    
+    /*    color:#333;
+        font-family: Tahoma, Geneva, "Proxima Nova Regular","Segoe UI",Roboto,"Droid Sans","Helvetica Neue",Arial,sans-serif*/
+/*    color: #0000FF;*/
+}
+
+
+div{
+    background-color: transparent; /*override layout.css*/
+}
+
+/*----------------------------*/
+/*MARGINS AND PADDINGS:*/
+
+.title{ 
+    padding: 4px;
+}
+
+.skinnable-panel{
+    padding: 8px; /*19px;*/
+}
+
+.v-layout-bottom {
+    padding-top: 8px;
+}
+div.h-wrapper{
+    padding: 8px;
+}
+
+div.h-layout-center > div.h-wrapper{
+    padding-left:0px;
+    padding-right:0px;
+}
+
+div.input-params > div:not(:first-child){
+    margin-top: 8px;
+}
+
+div.input-params > div > div:not(:first-child){
+    margin-top: 8px;
+}
+
+#_qe_table_query  td{
+    padding-top: 12px; /*increase a bit than 8px cause visually is better*/
+    padding-right:8px;
+}
+
+#_qe_table_query .date-month{
+    margin-right: 4px;
+    margin-left: 4px;
+
+}
+
+/*----------------------------*/
+
+.skinnable-panel{ 
+    /*    padding: 6px; 19px;*/
+    background-color:#f5f5f5;
+    border:1px solid #e3e3e3;
+    -webkit-box-shadow:inset 0 1px 1px rgba(0,0,0,0.05);
+    -moz-box-shadow:inset 0 1px 1px rgba(0,0,0,0.05);
+    box-shadow:inset 0 1px 1px rgba(0,0,0,0.05)
+}
+.skinnable-panel{ 
+    -webkit-border-radius:6px;
+    -moz-border-radius:6px;
+    border-radius:6px;
+}
+
+.title {
+    -webkit-border-radius:4px 4px 4px 4px;
+    -moz-border-radius:4px 4px 4px 4px;
+    border-radius:4px 4px 4px 4px;
+
+}
+
+a{
+    color: #829aa8;
+}
+
+a:hover{
+    color:#005580;text-decoration:underline
+}
+
+.title, .myButton{
+    color: #fff;
+    border: 1px solid #677c89;
+    font-weight: bold;
+    background-color: #8FB4B9; /*#829aa8*/;
+}
+
+
+.white-transparent{
+
+    /*gradients (from IE10 on)*/
+    background: -webkit-linear-gradient(rgba(255,255,255,0.9),rgba(255,255,255,0.4)); /*Safari 5.1-6*/
+    background: -o-linear-gradient(rgba(255,255,255,0.9),rgba(255,255,255,0.4)); /*Opera 11.1-12*/
+    background: -moz-linear-gradient(rgba(255,255,255,0.9),rgba(255,255,255,0.4)); /*Fx 3.6-15*/
+    background: linear-gradient(rgba(255,255,255,0.9),rgba(255,255,255,0.4)); /*Standard*/   
+}
+
+.raised{
+    -webkit-box-shadow: 5px 5px 20px 5px rgba(0,0,0,0.3);
+    -moz-box-shadow: 5px 5px 20px 5px rgba(0,0,0,0.3);
+    box-shadow: 5px 5px 20px 5px rgba(0,0,0,0.3);
+}
+
+
+span, label, select, input{
+    padding:2px;
+}
+
+
+/*TABLE FDSN EVENT QUERY====================================================*/
+
+table.fdsn { 
+	border-spacing:0; /*background-color:white;*/
+    border-collapse: initial;
+    white-space: normal; /*otherwise tbody width might overflow*/
+}
+
+table.fdsn thead { /*defined also above with .title*/
+    border-top-left-radius: 1ex;
+    border-top-right-radius: 1ex;
+
+}
+table.fdsn thead a{ /*overrides a default (defined above))*/
+    color: #fff;
+}
+
+table.fdsn tbody{
+    border: 1px solid #d3d3d3;
+}
+
+table.fdsn tbody{
+    background-color: white;
+}
+/*shadow effects for all td's*/
+table.fdsn tbody tr:not(:last-child) td{
+    /*box-shadow: inset 0 2px 2px rgba(0,0,0,0.1);*/
+    border-bottom: 1px solid #ccc;
+}
+
+/*table td paddings*/
+table.fdsn td{
+    /*padding:0.2em 0.5em 0.2em 0.5em;*/
+    /*SET THIS VALUE FOR DEBUG:*/
+    /*border: 1px solid #000;*/
+}
+/*control min-width for queery table cells:*/
+table.fdsn tbody td:not(:first-child){
+    min-width: 3.3em;
+}
+
+
+/*TABLE FDSN EVENT QUERY====================================================*/
+
+.pbar-container{
+    padding: 3px;
+}
+
+
+.myButton, div.olControlZoom a, .pbar, .bar{
+    -moz-box-shadow:inset 0px 1px 0px 0px #c3d4f7; /*#54a3f7;*/
+    -webkit-box-shadow:inset 0px 1px 0px 0px #c3d4f7;
+    box-shadow:inset 0px 1px 0px 0px #c3d4f7;
+
+    /*#8FB4B9;*/ /*#829aa8*/;
+
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #8FB4B9), color-stop(1, #829aa8));
+    background:-moz-linear-gradient(top, #8FB4B9 5%, #829aa8 100%);
+    background:-webkit-linear-gradient(top, #8FB4B9 5%, #829aa8 100%);
+    background:-o-linear-gradient(top, #8FB4B9 5%, #829aa8 100%);
+    background:-ms-linear-gradient(top, #8FB4B9 5%, #829aa8 100%);
+    background:linear-gradient(to bottom, #8FB4B9 5%, #829aa8 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#8FB4B9', endColorstr='#829aa8',GradientType=0);
+
+    /*background-color:#007dc1;*/
+    -moz-border-radius:4px;
+    -webkit-border-radius:4px;
+    border-radius:4px;
+
+    /*border:1px solid #124d77;
+    display:inline-block;*/
+    cursor:pointer;
+    /*color:#ffffff;*/
+    /*	font-family:arial;
+        font-size:13px;*/
+    text-decoration:none;
+    text-shadow:0px 1px 0px #154682;
+}
+
+.bar{
+    margin:5px;
+}
+
+.myButton{
+    padding:6px 24px;
+}
+
+.myButton:hover, div.olControlZoom a:hover{
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #829aa8), color-stop(1, #8FB4B9));
+    background:-moz-linear-gradient(top, #829aa8 5%, #8FB4B9 100%);
+    background:-webkit-linear-gradient(top, #829aa8 5%, #8FB4B9 100%);
+    background:-o-linear-gradient(top, #829aa8 5%, #8FB4B9 100%);
+    background:-ms-linear-gradient(top, #829aa8 5%, #8FB4B9 100%);
+    background:linear-gradient(to bottom, #829aa8 5%, #8FB4B9 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#829aa8', endColorstr='#8FB4B9',GradientType=0);
+    background-color:#0061a7;
+}
+
+.myButton:active {
+    position:relative;
+    top:1px;
+}
+
+.myButton{
+    background: rgb(143,180,185); /* Old browsers */
+    background: -moz-linear-gradient(top,  rgba(143,180,185,1) 0%, rgba(120,144,155,1) 50%, rgba(103,124,137,1) 50%, rgba(103,124,137,1) 50%, rgba(130,154,168,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(143,180,185,1)), color-stop(50%,rgba(120,144,155,1)), color-stop(50%,rgba(103,124,137,1)), color-stop(50%,rgba(103,124,137,1)), color-stop(100%,rgba(130,154,168,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(143,180,185,1) 0%,rgba(120,144,155,1) 50%,rgba(103,124,137,1) 50%,rgba(103,124,137,1) 50%,rgba(130,154,168,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(143,180,185,1) 0%,rgba(120,144,155,1) 50%,rgba(103,124,137,1) 50%,rgba(103,124,137,1) 50%,rgba(130,154,168,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(143,180,185,1) 0%,rgba(120,144,155,1) 50%,rgba(103,124,137,1) 50%,rgba(103,124,137,1) 50%,rgba(130,154,168,1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(143,180,185,1) 0%,rgba(120,144,155,1) 50%,rgba(103,124,137,1) 50%,rgba(103,124,137,1) 50%,rgba(130,154,168,1) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8fb4b9', endColorstr='#829aa8',GradientType=0 ); /* IE6-9 */
+}
+
+.simulation-msgs{
+/*    background:black;*/
+    color: #154652;
+    font-family: Ubuntu, 'Ubuntu Mono', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', 'Monaco', 'Courier New', monospace;
+}
+
+
+/*disabled stuff (copied from chrome).
+this makes disabled elements look the same across browser, and let us implement the disabled class name*/
+textarea:disabled, input:disabled{
+background-color: rgb(235, 235, 228);
+}
+.disabled,.disabled:hover,.disabled:visited, textarea:disabled, button:disabled, select:disabled, keygen:disabled, optgroup:disabled, user agent stylesheetinput:disabled {
+color: rgb(84, 84, 84);
+}
+
+/*MAKING THJE SELECTION COLOR AND SELECTION TEXTS:*/
+.selected{
+    background-color: #f07746;
+}
+
+/*overriding selection. Works in IE9+. See http://css-tricks.com/overriding-the-default-text-selection-color-with-css/*/
+::selection, option[selected] {
+    background: #f07746; /* WebKit/Blink Browsers */
+}
+::-moz-selection {
+    background: #f07746; /* Gecko Browsers */
+}
+
+/*for focus*/
+*:focus {
+    -webkit-box-shadow: 0px 0px 0px 3px #ccc;
+    -moz-box-shadow: 0px 0px 0px 3px #ccc;
+    box-shadow: 0px 0px 0px 3px #ccc;
+    outline:none
+	/*outline:thin solid #ccc;outline-offset:-4px*/
+}
+
+.radio.selected:not(:disabled), .check.selected:not(:disabled){
+    color: #f07746;
+    background-color: transparent;
+    font-weight: bold;
+}
+
+/*CUSTOM INPUTS AND DEFAULT INPUTS (SO THAT THEY LOOK THE SAME)*/
+input, .input, .radio, .list{
+    border-radius: 8px;
+    padding: 5px;
+}
+/*
+.list{
+    padding: 2px;
+    display:table;
+}
+*/
+.list > a, .radio, .list > a:hover, .radio:hover{
+    text-decoration: none;
+}
+
+/*Note: we cannot put the color declaration here in the selector above, we need to be more specific.
+Otherwise an <a.disabled> inside e.g. a <div.list> would have the color set HERE BELOW, not the one set for .disabled (see above)
+ANT IT's NOT A MATTER OF DECLARATION ORDER BUT OF SPECIFICITY.
+
+See HERE: http://www.w3.org/TR/2011/REC-CSS2-20110607/cascade.html#cascade
+
+:*/
+.list > a:not(.disabled), .radio:not(.disabled){
+    color: initial;
+}
+.list > a:not(.disabled):not(.selected):hover, .radio:not(.disabled):not(.selected):hover{
+   background-color: rgba(240, 119, 70,0.5);
+}
+
+.list > a{
+    /*these two make text display dots if overflows*/
+    text-overflow: ellipsis;
+    overflow: hidden;
+    /*other stuff:*/
+    padding: 0px 3px 0px 3px;
+    border-radius: 3px; /*should be list border radius - list padding*/
+    display: block; /*seems to display block without 100% width*/
+}
+
+
+input, .input, .list{
+    background-color: white;
+    border: 1px solid #ccc;
+}
+.radio{
+    display: inline-block;
+/*    padding: 2px 8px 2px 8px;*/
+}
+
+
+.radio.selected:not(:disabled):not(:focus), .check.selected:not(:disabled):not(:focus)  /*, .list:not(:disabled), input:not(:disabled)*/{
+/*    border: 1px solid;
+    border-color: rgba(0,0,0,0.3) rgba(255,255,255,0.7) rgba(255,255,255,0.7) rgba(0,0,0,0.3);
+*/
+    -webkit-box-shadow: inset 1px 1px 3px 0px rgba(0,0,0,0.4);
+    -moz-box-shadow: inset 1px 1px 3px 0px rgba(0,0,0,0.4);
+    box-shadow: inset 1px 1px 3px 0px rgba(0,0,0,0.4);
+}
+
+
+.list > a:not(:first-child){
+    margin-top:3px; /*for nicer effects, needs to be >= shadow (below) when selected*/
+}
+
+.list > a.selected:not(:disabled):not(:focus){
+    -webkit-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.4);
+    -moz-box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.4);
+    box-shadow: 2px 2px 5px 0px rgba(0,0,0,0.4);
+}

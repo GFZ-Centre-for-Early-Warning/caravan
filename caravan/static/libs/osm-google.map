@@ -1,0 +1,659 @@
+MAP
+  EXTENT 69.2916564941406 39.2314567565918 80.1751937866211 43.2681846618652
+  IMAGETYPE "png"
+  NAME "LOSSMAP"
+  SIZE 600 600
+  STATUS ON
+  UNITS DD
+
+  OUTPUTFORMAT
+    NAME "png"
+    MIMETYPE "image/png"
+    DRIVER "AGG/PNG"
+    EXTENSION "png"
+    IMAGEMODE RGB
+    TRANSPARENT TRUE
+  END # OUTPUTFORMAT
+
+  PROJECTION
+    "proj=longlat"
+    "datum=WGS84"
+    "no_defs"
+  END # PROJECTION
+  
+  LEGEND
+    KEYSIZE 20 10
+    KEYSPACING 5 5
+    LABEL
+      SIZE MEDIUM
+      OFFSET 0 0
+      SHADOWSIZE 1 1
+      TYPE BITMAP
+    END # LABEL
+    STATUS OFF
+  END # LEGEND
+
+ QUERYMAP
+    SIZE 10 10
+    STATUS OFF
+    STYLE HILITE
+  END # QUERYMAP
+
+  SYMBOL
+    NAME "sld_mark_symbol_circle_filled"
+    TYPE ELLIPSE
+    FILLED TRUE
+    POINTS
+      1 1
+    END
+  END
+  
+  SCALEBAR
+    INTERVALS 4
+    LABEL
+      SIZE MEDIUM
+      OFFSET 0 0
+      SHADOWSIZE 1 1
+      TYPE BITMAP
+    END # LABEL
+    SIZE 200 3
+    STATUS OFF
+    UNITS MILES
+  END # SCALEBAR
+
+  WEB
+    METADATA
+      "wms_title"	"loss_wms"
+      "wms_onlineresource"	"http://lhotse21.gfz-potsdam.de/cgi-bin/mapserv?map=/var/www/losstool/maps/osm-google.map"
+	  "wms_srs"	"EPSG:4326 EPSG:900913"
+      "wms_enable_request" "*"
+	  "wms_feature_info_mime_type" "text/html"
+    END # METADATA
+  END # WEB
+
+  LAYER
+    DATA "/var/www/losstool/apps/caravan/Intensities/intensities.tif"
+    METADATA
+      "wms_title"	"intensities"
+    END # METADATA
+    NAME "intensities"
+    PROJECTION
+      "proj=longlat"
+      "datum=WGS84"
+      "no_defs"
+    END # PROJECTION
+    STATUS ON
+    TILEITEM "location"
+    TYPE RASTER
+    UNITS METERS
+    CLASSITEM "[pixel]"
+	CLASS
+		EXPRESSION ([pixel] >= 1 AND [pixel] < 2)
+		STYLE
+			COLOR 44 123 182
+		END
+	END
+	CLASS
+		EXPRESSION ([pixel] >= 2 AND [pixel] < 3)
+		STYLE
+			COLOR 90 157 200
+		END
+	END
+	CLASS
+		EXPRESSION ([pixel] >= 3 AND [pixel] < 4)
+		STYLE
+			COLOR 136 191 219
+		END
+	END
+	CLASS
+		EXPRESSION ([pixel] >= 4 AND [pixel] < 5)
+		STYLE
+			COLOR 178 220 229
+		END
+	END
+	CLASS
+		EXPRESSION ([pixel] >= 5 AND [pixel] < 6)
+		STYLE
+			COLOR 209 234 213
+		END
+	END
+	CLASS
+		EXPRESSION ([pixel] >= 6 AND [pixel] < 7)
+		STYLE
+			COLOR 239 248 198
+		END
+	END
+	CLASS
+		EXPRESSION ([pixel] >= 7 AND [pixel] < 8)
+		STYLE
+			COLOR 254 249 173
+		END
+	END
+	CLASS
+		EXPRESSION ([pixel] >= 8 AND [pixel] < 9)
+		STYLE
+			COLOR 253 210 139
+		END
+	END
+	CLASS
+		EXPRESSION ([pixel] >= 9 AND [pixel] < 10)
+		STYLE
+			COLOR 253 181 105
+		END
+	END
+	CLASS
+		EXPRESSION ([pixel] >= 10 AND [pixel] < 11)
+		STYLE
+			COLOR 242 133 78
+		END
+	END
+	CLASS
+		EXPRESSION ([pixel] >= 11 AND [pixel] < 12)
+		STYLE
+			COLOR 228 79 53
+		END
+	END
+  END # LAYER
+
+  LAYER
+    DATA "/var/www/losstool/apps/landslides/LSI_0701.tif" #SHOULD BE PUT IN A DATABASE LATER... (POSTREGRE RASTER)
+    METADATA
+      "wms_title"	"landslides"
+    END # METADATA
+    NAME "landslides"
+    PROJECTION
+      "proj=longlat"
+      "datum=WGS84"
+      "no_defs"
+    END # PROJECTION
+    STATUS ON
+    TILEITEM "location"
+    TYPE RASTER
+    UNITS METERS
+    CLASSITEM "[pixel]"
+	CLASS
+		STYLE
+		  COLORRANGE 255 255 255 255 0 0 # black to yellow
+		  DATARANGE -8.0 8.0
+		  RANGEITEM "landslide susceptibility index (lsi)"
+		END
+	END
+  END # LAYER
+  
+  LAYER
+    CONNECTION "dbname='losstool' host=lhotse21.gfz-potsdam.de port=5432 user='postgres' password='postgres' sslmode=disable"
+    CONNECTIONTYPE POSTGIS
+    DATA 'geom FROM "public"."kg_landsatoli2013_builtup" USING UNIQUE id USING SRID=4326'
+    METADATA
+      "wms_title"	"kg_landsatoli2013_builtup"
+    END # METADATA
+    NAME "kg_landsatoli2013_builtup"
+    PROJECTION
+      "proj=longlat"
+      "datum=WGS84"
+      "no_defs"
+    END # PROJECTION
+    STATUS ON
+    TILEITEM "location"
+    TYPE POLYGON
+    UNITS METERS
+    CLASS
+      NAME "Single symbol"
+      STYLE
+        COLOR 43 43 43
+      END # STYLE
+    END # CLASS
+  END # LAYER
+  
+  LAYER
+    CONNECTION "dbname='losstool' host=lhotse21.gfz-potsdam.de port=5432 user='postgres' password='postgres' sslmode=disable"
+    CONNECTIONTYPE POSTGIS
+    DATA 'geom FROM "public"."ca_faults_trifonov_wgs84" USING UNIQUE id USING SRID=4326'
+    METADATA
+      "wms_title"	"ca_faults_trifonov_wgs84"
+    END # METADATA
+    NAME "ca_faults_trifonov_wgs84"
+    PROJECTION
+      "proj=longlat"
+      "datum=WGS84"
+      "no_defs"
+    END # PROJECTION
+    STATUS ON
+    TILEITEM "location"
+    TYPE LINE
+    UNITS METERS
+	CLASS
+      NAME "Single symbol"
+      STYLE
+        COLOR 0 0 0
+        LINECAP BUTT
+        PATTERN
+         1.00 2.00
+        END # PATTERN
+        WIDTH 1.5
+      END # STYLE
+    END # CLASS
+  END # LAYER
+ 
+  LAYER
+    CONNECTION "dbname='losstool' host=lhotse21.gfz-potsdam.de port=5432 user='postgres' password='postgres' sslmode=disable"
+    CONNECTIONTYPE POSTGIS
+    DATA 'wkb_geometry FROM "public"."places_loss" USING UNIQUE ogc_fid USING SRID=4326'    
+    METADATA
+      "wms_title"	"places_loss"
+    END # METADATA
+    NAME "places_loss"
+    PROJECTION
+      "proj=longlat"
+      "datum=WGS84"
+      "no_defs"
+    END # PROJECTION
+    STATUS ON
+    TILEITEM "location"
+    TYPE POINT
+    UNITS METERS
+    CLASS
+	  EXPRESSION ([loss.2] <= 1.0)
+      STYLE
+        COLOR 239 248 198
+        OUTLINECOLOR 0 0 0
+        SIZE 10
+        SYMBOL "sld_mark_symbol_circle_filled"
+      END # STYLE
+    END # CLASS
+    CLASS
+      EXPRESSION ([loss.2] > 1.0 AND [loss.2] <= 10.0)
+      STYLE
+        COLOR 254 249 173
+        OUTLINECOLOR 0 0 0
+        SIZE 10
+        SYMBOL "sld_mark_symbol_circle_filled"
+      END # STYLE
+    END # CLASS
+    CLASS
+      EXPRESSION ([loss.2] > 10.0 AND [loss.2] <= 100.0)
+      STYLE
+        COLOR 253 210 139
+        OUTLINECOLOR 0 0 0
+        SIZE 10
+        SYMBOL "sld_mark_symbol_circle_filled"
+      END # STYLE
+    END # CLASS
+    CLASS
+      EXPRESSION ([loss.2] > 100.0 AND [loss.2] <= 1000.0)
+      STYLE
+        COLOR 253 181 105
+        OUTLINECOLOR 0 0 0
+        SIZE 10
+        SYMBOL "sld_mark_symbol_circle_filled"
+      END # STYLE
+    END # CLASS
+    CLASS
+      EXPRESSION ([loss.2] > 1000.0 AND [loss.2] <= 10000.0)
+      STYLE
+        COLOR 242 133 78
+        OUTLINECOLOR 0 0 0
+        SIZE 10
+        SYMBOL "sld_mark_symbol_circle_filled"
+      END # STYLE
+    END # CLASS
+    CLASS
+      EXPRESSION ([loss.2] > 10000.0 AND [loss.2] <= 100000.0)
+      STYLE
+        COLOR  228 79 53
+        OUTLINECOLOR 0 0 0
+        SIZE 10
+        SYMBOL "sld_mark_symbol_circle_filled"
+      END # STYLE
+    END # CLASS
+    CLASS
+      EXPRESSION ([loss.2] > 100000.0 AND [loss.2] <= 1000000.0)
+      STYLE
+        COLOR 215 25 28
+        OUTLINECOLOR 0 0 0
+        SIZE 10
+        SYMBOL "sld_mark_symbol_circle_filled"
+      END # STYLE
+    END # CLASS
+  END # LAYER
+  
+  LAYER
+    CONNECTION "dbname='losstool' host=lhotse21.gfz-potsdam.de port=5432 user='postgres' password='postgres' sslmode=disable"
+    CONNECTIONTYPE POSTGIS
+    DATA 'the_geom FROM "public"."urbanstructures" USING UNIQUE gid USING SRID=32643'
+    FILTER (( ("structure"= 1)  OR  ("structure"= 2)  OR  ("structure"= 3)  OR  ("structure"= 4)  OR  ("structure"= 5)  OR  ("structure"= 6)  OR  ("structure"= 7)  OR  ("structure"= 8)  OR  ("structure"= 9)  OR  ("structure"= 10)  OR  ("structure"= 11)  OR  ("structure"= 12)  OR  ("structure"= 13)  OR  ("structure"= 14)  OR  ("structure"= 15)  OR  ("structure"= 16)  OR  ("structure"= 17)  OR  ("structure"= 18)  OR  ("structure"= 19)  OR  ("structure"= 20)  OR  ("structure"= 21) ))
+    METADATA
+		"wms_title" "urbanstructures"
+    END 
+    NAME "urbanstructures"
+    PROJECTION
+      "proj=utm"
+      "zone=43"
+      "datum=WGS84"
+      "units=m"
+      "no_defs"
+    END # PROJECTION
+    STATUS ON
+    TILEITEM "location"
+    TYPE POLYGON
+    UNITS METERS
+    CLASS
+      NAME "1"
+      EXPRESSION ([structure] =1)
+      STYLE
+        COLOR 201 201 201
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 201 201 201
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "2"
+      EXPRESSION ([structure] =2)
+      STYLE
+        COLOR 219 219 219
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 219 219 219
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "3"
+      EXPRESSION ([structure] =3)
+      STYLE
+        COLOR 168 168 168
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 168 168 168
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "4"
+      EXPRESSION ([structure] =4)
+      STYLE
+        COLOR 148 160 220
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 148 160 220
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "5"
+      EXPRESSION ([structure] =5)
+      STYLE
+        COLOR 187 196 227
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 187 196 227
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "6"
+      EXPRESSION ([structure] =6)
+      STYLE
+        COLOR 124 132 172
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 124 132 172
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "7"
+      EXPRESSION ([structure] =7)
+      STYLE
+        COLOR 157 201 255
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 157 201 255
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "8"
+      EXPRESSION ([structure] =8)
+      STYLE
+        COLOR 210 224 255
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 210 224 255
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "9"
+      EXPRESSION ([structure] =9)
+      STYLE
+        COLOR 77 169 194
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 77 169 194
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "10"
+      EXPRESSION ([structure] =10)
+      STYLE
+        COLOR 255 255 157
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 255 255 157
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "11"
+      EXPRESSION ([structure] =11)
+      STYLE
+        COLOR 255 255 210
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 255 255 210
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "12"
+      EXPRESSION ([structure] =12)
+      STYLE
+        COLOR 220 220 148
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 220 220 148
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "13"
+      EXPRESSION ([structure] =13)
+      STYLE
+        COLOR 255 196 77
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 255 196 77
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "14"
+      EXPRESSION ([structure] =14)
+      STYLE
+        COLOR 255 224 165
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 255 224 165
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "15"
+      EXPRESSION ([structure] =15)
+      STYLE
+        COLOR 194 155 77
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 194 155 77
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "16"
+      EXPRESSION ([structure] =16)
+      STYLE
+        COLOR 46 126 187
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "17"
+      EXPRESSION ([structure] =17)
+      STYLE
+        COLOR 34 114 181
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "18"
+      EXPRESSION ([structure] =18)
+      STYLE
+        COLOR 25 102 173
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "19"
+      EXPRESSION ([structure] =19)
+      STYLE
+        COLOR 15 90 163
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "20"
+      EXPRESSION ([structure] =20)
+      STYLE
+        COLOR 8 78 151
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "21"
+      EXPRESSION ([structure] =21)
+      STYLE
+        COLOR 8 62 129
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+  END # LAYER
+  
+  LAYER
+    CONNECTION "dbname='losstool' host=lhotse21.gfz-potsdam.de port=5432 user='postgres' password='postgres' sslmode=disable"
+    CONNECTIONTYPE POSTGIS
+    DATA 'wkb_geometry FROM "public"."urbanstructures_loss" USING UNIQUE ogc_fid USING SRID=4326'
+    METADATA
+      "wms_title"	"urbanstructures_loss"
+    END # METADATA
+    NAME "urbanstructures_loss"
+    PROJECTION
+      "proj=longlat"
+      "datum=WGS84"
+      "no_defs"
+    END # PROJECTION
+    STATUS ON
+    TILEITEM "location"
+    TYPE POLYGON
+    UNITS METERS
+    CLASS
+      NAME "0 - 1"
+      EXPRESSION ([est_fat] <= 1)
+      STYLE
+        COLOR 239 248 198
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "1 - 10"
+      EXPRESSION ([est_fat] > 1 AND [est_fat] <= 10)
+      STYLE
+        COLOR 254 249 173
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "10 - 100"
+      EXPRESSION ([est_fat] > 10 AND [est_fat] <= 100)
+      STYLE
+        COLOR 253 210 139
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "100 - 1000"
+      EXPRESSION ([est_fat] > 100 AND [est_fat] <= 1000)
+      STYLE
+        COLOR 253 181 105
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "1000 - 10000"
+      EXPRESSION ([est_fat] > 1000 AND [est_fat] <= 10000)
+      STYLE
+        COLOR 242 133 78
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+    CLASS
+      NAME "10000 - 100000"
+      EXPRESSION ([est_fat] > 10000 AND [est_fat] <= 100000)
+      STYLE
+        COLOR 228 79 53
+      END # STYLE
+      STYLE
+        OUTLINECOLOR 0 0 0
+        WIDTH 0.26
+      END # STYLE
+    END # CLASS
+  END # LAYER
+  	 
+END # MAP
+

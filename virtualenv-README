@@ -1,0 +1,49 @@
+.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
+Get version of python (shows all installed versions. You can use 'whereis python3.4' too): 
+.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
+
+	$ whereis python 
+
+(Reminder: Also 'which' instead of 'whereis' is fine. The latter - whereis - searches through a list of certain directories - listed in man - for source/binary and manuals sections. The former searches only for binaries in $PATH)
+
+.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
+See if virtualenv is installed (http://www.pythonforbeginners.com/basics/how-to-use-python-virtualenv)
+.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
+
+	$ virtualenv --version 
+
+.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
+Install virtualenv (if previous command "fails", ie does not show a version num):
+.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
+
+	$ sudo apt-get install python-virtualenv
+	$ sudo easy_install virtualenv
+	$ sudo pip install virtualenv
+
+.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
+Create a new virtualenv inside myproject (see http://www.dabapps.com/blog/introduction-to-pip-and-virtualenv-python/)
+.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
+
+	$ cd ~/code/myproject/
+	$ virtualenv env
+
+(Here, env is just the name of the directory you want to create your virtual environment inside. It's a common convention to call this directory env. IMPORTANT: if you're using a version control system like git, you shouldn't commit the env directory. Add it to your .gitignore file or similar. IMPORTANT2: In https://github.com/github/gitignore there are already built-in gitignore files. The python .gitignore file there already contains "env", so if you downloaded the file and put it in your git folder you don't have anything to do).
+
+.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
+Create a new virtualenv inside ~/code/myproject/ (see http://stackoverflow.com/questions/1534210/use-different-python-version-with-virtualenv)
+.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
+
+	$ virtualenv -p /usr/bin/python2.6 ~/code/myproject/env
+
+(or if you are already in myproject via cd, just type virtualenv -p /usr/bin/python2.6 env)
+
+
+.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
+WHY NOT SIMPLY SWITCHING BETWEEN PYTHON VERSIONS? I.E., INSTALL SEVERAL VERSIONS AND SWITCH BETWEEN THEM?
+
+http://askubuntu.com/questions/14615/how-do-i-make-the-terminal-run-python-3-1/14624#14624
+
+
+
+
+

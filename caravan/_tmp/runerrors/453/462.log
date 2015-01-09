@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/home/riccardo/projects/sources/python/caravan/caravan/core/core.py", line 74, in geocell_run
+    _dist = [v for v in globals.discretedist(intensity,_intensity_labels)]
+AttributeError: 'module' object has no attribute 'discretedist'
