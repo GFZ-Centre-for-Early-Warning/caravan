@@ -58,6 +58,11 @@ def wait(conn):
             raise psycopg2.OperationalError("poll() returned %s" % state)
 
 def connect(host=HOST, dbname=DBNAME, user=USER,  password=PSWD, async=ASYNC):
+    """
+        Returns the psycopg connection with given arguments, which default if
+        missing to the relative globally defined variables. The returned object
+        can be passed to the functions of these module or as psycopg2 connection
+    """
     #see http://initd.org/psycopg/docs/advanced.html#asynchronous-support
     aconn = psycopg2.connect(host=host, dbname=dbname, user=user,  password=password, async=async)
     if async:

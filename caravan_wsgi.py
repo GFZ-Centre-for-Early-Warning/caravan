@@ -17,14 +17,11 @@ __author__="Riccardo Zaccarelli, PhD <riccardo(at)gfz-potsdam.de, riccardo.zacca
 __date__ ="$Jun 23, 2014 1:15:27 PM$"
 
 import json
-
 import traceback
 from cgi import parse_qs, escape #for parsing get method in main page (address bar)
 
 import time
-
-
-CARAVAN_DEBUG = True; #debug variable, as of Juli 2014 it controls whether exceptions in ResponseHandler should throw the traceback or simply an error message
+CARAVAN_DEBUG = False; #debug variable, as of Juli 2014 it controls whether exceptions in ResponseHandler should throw the traceback or simply an error message
 
 
 import os
@@ -41,10 +38,12 @@ import mcerp
 import caravan.settings.globalkeys as gk
 import caravan.settings.globals as glb
 import caravan.fdsnws_events as fe
-import json
+import json, re
 CaravanApp = miniwsgi.App()
 
-@CaravanApp.route(url='caravan/static/index.html', headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html', 
+#@CaravanApp.route(url='caravan/static/index.html', headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html', 
+#re.compile(r"\.(?:jpg|jpeg|bmp|gif|png|tif|tiff|js|css|xml)$", re.IGNORECASE)
+@CaravanApp.route(url=re.compile(r'(caravan/static/index.html|^$)'), headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html', 
 def caravan_mainpage(request, response):
     return request.urlbody
     #return open('caravan/static/index.html','rb')
@@ -57,16 +56,14 @@ def fdsn_query(request, response):
         query_url = ""
         try:
             form = request.post
-            s=[]
-            catalog=''
+            s = []
+            catalog = ''
             for key in form.keys(): 
                 l = form.getlist(key)
                 if key == 'catalog':
                     catalog=l[0]
                 else:
-                    
                     par = glb.params[key]
-                    
                     fdsn_name = par['fdsn_name']
                     istime = key == gk.TIM
                     
@@ -74,26 +71,20 @@ def fdsn_query(request, response):
                         vmin = glb.cast(par,l[0])
                         vmax = glb.cast(par,l[1], round_ceil=True)
                         
-                        #fdsn format: 2014-12-07T01:22:03.2Z
+                        #fdsn format: 2014-12-07T01:22:03.2Z. Let's conver it
                         vmin = "start{0}={1:04d}-{2:02d}-{3:02d}T{4:02d}:{5:02d}:{6:02d}.{7:d}Z".format(fdsn_name,vmin.year, vmin.month, vmin.day, vmin.hour, vmin.minute, vmin.second,vmin.microsecond)
                         vmax = "end{0}={1:04d}-{2:02d}-{3:02d}T{4:02d}:{5:02d}:{6:02d}.{7:d}Z".format(fdsn_name,vmax.year, vmax.month, vmax.day, vmax.hour, vmax.minute, vmax.second,vmax.microsecond)
                     else:
                         vmin = "min{0}={1}".format(fdsn_name, str(glb.cast(par,l[0],dim=-1))) #-1: needs scalar
                         vmax = "max{0}={1}".format(fdsn_name, glb.cast(par,l[1],dim=-1)) #-1: needs scalar
                     
-                    
                     s.append('{0}&{1}'.format(vmin, vmax))
             query_url = fe.FDSN_CATALOG[catalog]+ ('&'.join(s))         
         except:pass   
         
-    
-     
-    
-    #define here the ORDER of the columns!
+        #define here the ORDER of the columns!
         cols = ("EventLocationName","Time","Latitude","Longitude", "Depth", "Magnitude") #, "EventId")
         submittable_keys = {"Latitude": gk.LAT,"Longitude": gk.LON, "Depth": gk.DEP, "Magnitude": gk.MAG} #numeric are also submittable
-    
-#     colsstr = ''.join("<td data-sort='{0}'>{1}</td>".format('num' if v in submittable_keys else 'str', v) for v in cols)
     
         value = ""
     
@@ -239,12 +230,12 @@ def query_simulation_data(request, response):
     #which need to be converted to double prior to json dumps
 
     data = conn.fetchall("""SELECT 
-ST_AsGeoJSON(ST_Transform(G.the_geom,4326))::json AS geometry, GM.geocell_id, risk.social_conseq.fatalities_prob_dist, GM.ground_motion
+ST_AsGeoJSON(ST_Transform(G.the_geom,4326))::json AS geometry, GM.geocell_id, GM.ground_motion, risk.social_conseq.fatalities_prob_dist
 FROM 
 processing.ground_motion as GM
-JOIN 
+LEFT JOIN 
 risk.social_conseq ON (risk.social_conseq.geocell_id = GM.geocell_id and risk.social_conseq.session_id = GM.session_id)
-JOIN 
+LEFT JOIN 
 exposure.geocells as G ON (G.gid = GM.geocell_id)
 WHERE 
 GM.session_id=%s""",(session_id,)) #(session_id,))
@@ -276,27 +267,32 @@ GM.session_id=%s""",(session_id,)) #(session_id,))
     #is present
     
     #Defined the columns to be set as properties (excluding geometry):
-    captions = {gk.FAT:2, gk.MSI:3} 
+    captions = {gk.MSI:2, gk.FAT:3, gk.ECL: 4} 
     
-    def process(name, data):
-        if name == gk.MSI: #return the median
-            #pop last element, which is the median according to core.py
-            m = data.pop() #removes and returns the last index
-            return data, m
-        elif name == gk.FAT: #return INDEX OF max value
-            remVal = 1
-            max = 0
-            ind_of_max = 0
-            i = 0
-            for n in data:
-                if n > max: 
-                    max = n
-                    ind_of_max = i
-                remVal -= n
-                if remVal < max: break #< not <=: priority to higher value, if two or more are equal
-                i += 1
-                
-            return data, ind_of_max
+    def process(name, row, row_index):
+        try:
+            data = row[row_index]
+            if name == gk.MSI: #return the median
+                #pop last element, which is the median according to core.py
+                m = data.pop() #removes and returns the last index
+                return data, m
+            elif name == gk.FAT: #return INDEX OF max value
+                remVal = 1
+                max = 0
+                ind_of_max = 0
+                i = 0
+                for n in data:
+                    if n > max: 
+                        max = n
+                        ind_of_max = i
+                    remVal -= n
+                    if remVal < max: break #< not <=: priority to higher value, if two or more are equal
+                    i += 1
+
+                return data, ind_of_max
+            elif name == gk.ECL: #economic losses, to be implemented
+                pass
+        except: pass #exception: return None, None below
         #elif ... here implement new values for newly added names
         return None, None
     
@@ -307,7 +303,7 @@ GM.session_id=%s""",(session_id,)) #(session_id,))
         cell = {'geometry': row[0], 'id':row[1], 'type':'Feature', 'properties':{}}
         for name in captions:
             index = captions[name]
-            data, value = process(name, row[index])
+            data, value = process(name, row, index)
             property = {'data': data, 'value': value}
             cell['properties'][name] = property
 

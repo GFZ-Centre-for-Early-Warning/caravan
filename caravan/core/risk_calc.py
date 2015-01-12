@@ -1,14 +1,15 @@
 #! /usr/bin/python
 
 """
-     
-(c) 2014, GFZ Potsdam
+    Risk calculation module. It calls class defined in the risk module package
+    Code copied and modified from Michael
+    
+    (c) 2014, GFZ Potsdam
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
-Free Software Foundation; either version 2, or (at your option) any later
-version. For more information, see http://www.gnu.org/
-
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2, or (at your option) any later
+    version. For more information, see http://www.gnu.org/
 """
 
 __author__= "Michael Haas mhaas(at)gfz-potsdam.de, Riccardo Zaccarelli, PhD (<riccardo(at)gfz-potsdam.de>, <riccardo.zaccarelli(at)gmail.com>)" 
@@ -37,46 +38,13 @@ import caravan.settings.globals as glb
 #percentiles = an array of values usually [0.05 0.25 0.50 0.75 0.95]
 def calculaterisk(gm, percentiles, session_id, scenario_id, target_id, geocell_id):
     
+    db_conn = glb.connection() #FIXME: THIS CAN BE PASSED FROM THE MAIN METHOD?
     
-    #percentiles = [0.05,0.25,0.5,0.75,0.95]
-    
-#    db_conn = 'user=postgres password=postgres host=localhost dbname=deserve'
-    
-    #FIXME: reimplement for speed (pass the connection!)
-    
-#    db_conn = 'user=postgres password=postgres host=localhost dbname=caravan'
-
-    #WE DO NOT PASS A STRING< BUT THE CONNECTION CLASS, WHICH DOES NOT REQUIRE A CONNECTION EACH TIME
-    #MOREOVER, WE NEED TO PASS A dbutils.Connection object to handle async connections
-    
-    db_conn = glb.connection() #FIXME: THIS CAN BE PASSED FROM THE MAIN METHOD
-    
-    #scenario
-    #scenario_id=25
-
-    #Exposure
-    #tess_id = 5
-    #target_id = None
-
-    #get scenario information
-    #haz = hazard_module.hazard(db_conn,scenario_id)
-    
-    #get affected location [[target_id,geocell_id]] of the selected tesselation
-    #locs = haz.affected_locations(tess_id)
-    
-    # loop over all affected locations
-    #for elem in locs:
-
-    #geocell_id for location
-    #geocell_id = elem[1]
 
     # get exposure informations for the given location
     exp = exposure_module.exposure(db_conn,geocell_id)
 
-    #calculate ground motion distribution
-    #gm = haz.calculate(exp.target_loc,elem)
-
-
+    
     #Get DPMs
     vul = vulnerability_module.vulnerability(gm,exp.bldg_dist,exp.bt_prop)
     #dg_pdfs=vul.dg_pdf #FIXME: UNUSED
@@ -89,9 +57,7 @@ def calculaterisk(gm, percentiles, session_id, scenario_id, target_id, geocell_i
     loss.calculate()
     loss.write2db(db_conn, percentiles)
     
-    #physical = risk[0] #FIXME: UNUSED
-    #social = risk[1] #FIXME: UNUSED
-
+    
 if __name__ == "__main__":
     import mcerp
     calculaterisk(mcerp.Normal(5,0.25),[0.05, 0.25, 0.5, 0.75, 0.95], 0,0,0)

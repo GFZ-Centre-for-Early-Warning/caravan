@@ -34,6 +34,7 @@ import caravan.dbutils as dbutils
 from caravan.core.gmpes.gmpe_utils import SOF as styleoffaulting #"AS" IS !ESSENTIAL!: IT AVOIDS CONFLICTS WITH PARAMS SOF (see get function)
 import caravan.parser as parser
 import caravan.core.gmpes.gmpes as gmpes
+
 #TODOLIST:
 #    Visualizzare prob. dist
 #    controllare process delay before progressbar starts
@@ -51,8 +52,6 @@ import caravan.core.gmpes.gmpes as gmpes
 #    handle m=distrib and bounds check in gmpes
 #    Handle pickable stuff AND implement in globals function for converting mcerp -> floats numpy etcetera
 #    ground motion only should NOT return the fatalities. Does it? (I guessno...)
-
-#importing from settins.py (see doc there):
 
 #tessellation ids:
 tess_ids = opts.tess_ids #Other values (7,6,3,2,1)
@@ -85,18 +84,6 @@ def dumps(obj):
 def fdsncatalogs():
     from caravan.fdsnws_events import FDSN_CATALOG as cat
     return ''.join('<a href=# data-value="{0}">{0}</a>'.format(k) for k in cat)
-#     s = StringIO()
-#     s.write(quote_char)
-#     for v in string:
-#         if v=='\\' or v ==quote_char: s.write('\\')
-#         elif v=='\n' or v=='\r' or v=='\t': 
-#             s.write('\\')
-#             v = 't' if v=='\t' else 'n'
-#         s.write(v)
-#     s.write(quote_char)
-#     ret = s.getvalue()
-#     s.close()
-#     return ret
 
 def glbkeys():
     return {k:v for k,v in gk.__dict__.iteritems() if k[0]!='_'}
@@ -371,7 +358,6 @@ def cast(param, value, **options):
             cast('lat', "33.4493", decimals=2) #returns '33.45', regardless of whether params['lat']['parse_opts']['decimals'] is set or not
             
     """
-#     try:
     p = param if isinstance(param,_Param) else params[param]
     
     if not 'parse_func' in p: return value
@@ -382,9 +368,6 @@ def cast(param, value, **options):
     optz.update(options)
     
     return func(value, **optz)
-#     except Exception as e:
-#         raise Exception((str(param['name']) if isinstance(param,_Param) and 'name' in param else str(param))+": "+str(e))
-
 
 def discretepdf(dist, ticks):
     """
@@ -443,18 +426,10 @@ def init():
     if mcerp_npts < minpts:    
         mcerp_npts = minpts
     
-#    params[P_DNP]['default'] = mcerp_npts
-#    params[P_DNP]['interval'] = [minpts, 10000]
-    
-#    global def_gmpes
-#    from gmpes import getgmpes
-#    for k, v in getgmpes(sys, additional_gmpes_modules):
-#        def_gmpes[k] = v
     
 init() #execute the code above
 
 #TODO LIST. NOTE: WILL BE REMOVED!
-
 #TO DO:
 #CHECK deletion of previous sessions, scenarios etcetera. It's a mess...
 #check why I got failed/done mismatch (maybe add a log on the failed sub-processes?)

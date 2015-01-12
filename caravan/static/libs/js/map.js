@@ -200,16 +200,21 @@
         	return {
         		opacity: 0,
                 fillOpacity: 0
-        	}
-        }
+        	};
+        };
+        
         //passing an empty dict tot the style function
         function getStyleFunction(layer_key_name){
         	return function(feature){
         		if(layer_key_name in feature.properties){
         			if('styleFcn' in _layers[layer_key_name]){
-        				var defOpts = DEFAULT_STYLE();
-        				_layers[layer_key_name].styleFcn(feature, feature.properties[layer_key_name], _layers[layer_key_name].colorMap, defOpts); 
-        				return defOpts;
+        				var props = feature.properties[layer_key_name];
+                        var val = props.value;
+                        if(val!==null && val!==undefined){
+                            var defOpts = DEFAULT_STYLE();
+                            _layers[layer_key_name].styleFcn(feature, val, _layers[layer_key_name].colorMap, defOpts); 
+                            return defOpts;
+                        }
         			}
         		}
         		return EMPTY_STYLE();
@@ -221,7 +226,7 @@
         var control = (function(){
         	function Control(){
             	var _style_ = 'none';
-            	var imgs = {'none': crvn.imgPath('arrow-down-01-32.png'), "":crvn.imgPath('arrow-up-01-32.png')}
+            	var imgs = {'none': crvn.imgPath('arrow-down-01-32.png'), "":crvn.imgPath('arrow-up-01-32.png')};
             	var _div = $("\
             	<div id=leaflet-control class='leaflet-bar'>\
             	<div id=legend-container>\

@@ -259,14 +259,12 @@
                 //implement it more nicely
                 
                 map.addLayer('intens', $('#intensLegend'), true,
-                    function(feature, featureData, colorMap, defOpts){
-                        var val = featureData.value;
+                    function(feature, val, colorMap, defOpts){
                         defOpts.fillColor = colorMap.color(val);
                     }
                 );
                 map.addLayer('fatal', $('#fatalLegend'), false,
-                    function(feature, featureData, colorMap, defOpts){
-                        var val = featureData.value; //val is the index of max in this case
+                    function(feature, val, colorMap, defOpts){
                         defOpts.fillColor = colorMap.color(colorMap.values()[val]);
                     }
                 );
@@ -275,6 +273,12 @@
                 var leaf = L;
                 var isNotIeNorOpera = !leaf.Browser.ie && !leaf.Browser.opera;
                 map.on('mouseover', function(name, layer, feature, featureData, e){
+                    var data = featureData.data;
+                    var val = featureData.value;
+                    if(data===null || data===undefined || val === null || val === undefined){
+                        return;
+                    }
+                    
                     e.layer.setStyle({
                         weight: 1,
                         fillOpacity: 0.75
@@ -282,6 +286,7 @@
                     if (isNotIeNorOpera) {
                         e.layer.bringToFront();
                     }
+                    
                     //now show popup (this is the caravan.map object):
                     mapPopup.apply(this, [name, feature, featureData, this.getColorMap(name)]);
                 });

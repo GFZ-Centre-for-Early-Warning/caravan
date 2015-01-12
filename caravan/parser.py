@@ -115,8 +115,6 @@ def _default_parsefloat(val):
     vf = float(val)
     if isnan(vf):
         raise Exception("value is NaN")
-#    elif isinf(vf):
-#        raise Exception("value is + or - Infinity")
         
     return vf
 
@@ -523,7 +521,7 @@ def parsedate(val, separator_chars = _default_datesep, formatting='', round_ceil
         if ret_date is None: raise _dateexc(val)
         
         if round_ceil:
-            #in thi case we need to go up one month, and then substract one millisecond
+            #in case we need to go up one month, and then substract one millisecond
             #Getting till the end of the specified month iss too complex with integers 
             #(what about bisestiles years if we are the 28th of february?)
             y = ret_date.year+1 if ret_date.month == 12 else ret_date.year
@@ -653,11 +651,6 @@ def isdim(val, interval):
     if not isscalar(val) and hasattr(val, "__len__"):
         dim = len(val)
     return _isin(dim, interval)
-    
-#    if scalar and _isin(-1, interval): return True
-#    leng = 0 if val is None else 1 if scalar else len(val)
-#    return _isin(leng, interval)
-
 
 _default_sep = {',',';'}
 _default_quote = {'"',"'"}
@@ -727,13 +720,10 @@ def parsefield(s, separator_chars = _default_sep, quote_chars=_default_quote, wh
     res =[]
     if parsefunc:
         for v, q in token(s, separator_chars, quote_chars,whitespace_chars, parse_num=None, parse_bool=None):
-            #if q is None and not v: v = None
-            #print("tokena:" + str(v)+" "+str(parsefunc(v,q)))
             res.append(parsefunc(v,q))
     else:
         for v, q in token(s, separator_chars, quote_chars,whitespace_chars, parse_num=None, parse_bool=None):
             res.append(v)
-            #res.append(None if q is None and not v else v)
     
     if t is None:
         l = len(res)
@@ -742,8 +732,6 @@ def parsefield(s, separator_chars = _default_sep, quote_chars=_default_quote, wh
     elif t==tuple:
         res = tuple(res)
     
-    #print("A "+str(res))
-    #res = res[0] if t is None and len(res)==1 else tuple(res) if t==tuple else res
     return res
 
 #adjacent wspaces are ignored if they follow or preceed a separator char, otherwise they are treated as sep char
@@ -842,7 +830,6 @@ parse_num = _default_parsefloat, parse_bool = _default_parsebool):
         v = buf.getvalue()
         buf.close()
         if quote_char: return v, quote_char
-        #buf = None
         if parse_num:
             try: return parse_num(v), None 
             except: pass
@@ -908,12 +895,9 @@ parse_num = _default_parsefloat, parse_bool = _default_parsebool):
     if buf: 
         if quote_char:
             raise Exception("Unclosed quoted string '{0}' (end-of-stream found)".format(buf.getvalue()))
-        #print('accusi')
         yield data()
     
     return
-#    if hasattr(s, "close"):
-#        s.close()
 
 def _ps(arr):
     s = str(type(arr)) +": "+ '|'.join([str(s)+" ("+str(type(s))+")" for s in arr]) if hasattr(arr,"__len__") and not isstring(arr) else \
@@ -921,33 +905,4 @@ def _ps(arr):
     print(s)
     
 if __name__ == "__main__":
-    
     print(str(parsefield('2014',parsefunc=parseint)))
-    
-#     
-#     s=[
-#         " 14:00 , [asd, d gtr;],  asd ",
-#         [3,4,5],
-#         " 3.4445666 4 , 5",
-#         " 3.4445666 14 , 5",
-#         " 0.1 0.4 , 0.5  ",
-#         "",
-#         "  ",
-#         "  \"asd , asd",
-#         "\"asd ,\" asd",
-#         "1 , false",
-#         "[1.23]",
-#         "(1.23, -4)",
-#         "1.12"
-#     ]
-#     
-#     for ss in s:
-#         _ps(ss)
-#         try:
-#             sss = parsefloat(ss, decimals=1, interval=[-10,10], dim=[0,3])
-#         except Exception as e:
-#             import traceback
-#             #traceback.print_exc()
-#             sss = e
-#         _ps(sss)
-#         print("\n")

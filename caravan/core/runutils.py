@@ -14,9 +14,6 @@ number between 0 to 100 indicating the progress state. Any error encountered in
 the process is stored in the class and can be queryed via the method errormsg.
 All methods of this class are synchronized and therefore are thread safe
 
-R(unnable) Scenarios are subclasses of scenario with methods implemented to 
-keep track of a Caravan run simulation
-
 (c) 2014, GFZ Potsdam
 
 This program is free software; you can redistribute it and/or modify it
@@ -227,11 +224,7 @@ class RunInfo(object):
         return "input: "+str(self.__scenario)+", status: "+self.statusmsg
     
 
-if __name__ == '__main__':
-#    a = array('c', 'a-b-: forza bologna!c')
-    quit()
-#    a = CharArray('a-b-: forza bologna!c')
-
+#if __name__ == '__main__':
 
 
     
