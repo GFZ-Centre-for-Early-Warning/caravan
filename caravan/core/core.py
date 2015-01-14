@@ -41,7 +41,7 @@ import caravan.settings.globalkeys as gk
 import caravan.settings.globals as globals
 import risk_calc
 
-_DEBUG_= 1
+_DEBUG_= globals._DEBUG_
 #mcerp.npts = globals.mcerp_npts
 import os
 import random

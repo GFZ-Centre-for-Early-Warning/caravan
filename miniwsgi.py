@@ -272,6 +272,18 @@ def unescape(string):
         h = HTMLParser.HTMLParser()
         return h.unescape(string)
 
+def read(url, charset='UTF-8'):
+    """
+        reads the given url, which must point to a valid file. 
+        An exception is thrown if file does not exist
+    """
+    if os.path.exists(url):
+        file_obj = open(url, 'rb') if PY3 else open(url, 'r') 
+        file_body = file_obj.read() 
+        file_obj.close() 
+        return file_body.decode(charset)
+    else: 
+        raise Exception("cannot read body: url \"{0}\" not found".format(url));
 
 #Reads the file pointed by the given url (relative path can be given) and returns its content as string, or None on FileNotFound    
 def geturlbody(environ, charset='UTF-8'):
@@ -279,14 +291,7 @@ def geturlbody(environ, charset='UTF-8'):
         Reads the content of the given url, returning a string
         raises an exception if file not found
     """
-    url = geturl(environ)
-    if os.path.exists(url):
-        file_obj = open(url, 'rb') if PY3 else open(url, 'r') 
-        file_body = file_obj.read() 
-        file_obj.close() 
-        return file_body.decode(charset)
-    else: 
-        raise Exception("read error: {0} not found".format(url or "url"));
+    return read(geturl(environ))
 
 def geturl(environ):
     """
@@ -1237,7 +1242,7 @@ class App(object):
         url = request.url
         if not os.path.exists(url):
             response.status = httplib.NOT_FOUND
-            raise Exception('{0} not found'.format(url))
+            raise Exception('url "{0}" not found'.format(url))
         
         
         #from bottle.py. Sets content-type and content-encoding

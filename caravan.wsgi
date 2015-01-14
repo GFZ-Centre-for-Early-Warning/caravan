@@ -4,10 +4,7 @@
 #import os
 import sys	
 
-sys.path.insert(0, '/var/www/html/caravan/caravan')
-sys.path.insert(0, '/var/www/html/caravan/')
+sys.path.insert(0, '/var/www/html/caravan')
 
-#import webinterface
-#application = webinterface.application
-
-from main import application
+import main
+application = main.application

@@ -11,50 +11,15 @@ __date__ ="$Jan 12, 2015 5:32:51 PM$"
     Main file implementing the wsgi application
 """
 
-import sys, os
+import sys, os, caravan_wsgi
 
-def geturl(environ):
-    """
-        Reads the url string from environ, basically
-        environ['PATH_INFO'].lstrip('/')
-    """
-    url = environ['PATH_INFO']
-    if(url):
-        url = url.lstrip("/")
-    return url
+capp = caravan_wsgi.CaravanApp
 
-capp = None
-
+#change dir. NOW
+os.chdir(os.path.dirname('caravan/static/index.html'))
+    
 def application(environ, start_response):
-    #change the python working directory, if we called this script from outside the
-    #dir this file is. It is necessary otherwise all referrences to files, which are 
-    #relative, will be messed up in our app
-    pt = os.path.realpath(__file__)
-    os.chdir(os.path.dirname(pt))
-    
-    print('os_path: {0}'.format(os.path.dirname(pt)), file=sys.stderr)
-    output = ''
-    try:
-        #raise Exception("try-out")
-        global capp
-        if capp is None: 
-            import caravan_wsgi
-            capp = caravan_wsgi.CaravanApp
-        return capp(environ, start_response)
-    except Exception as e:
-        from StringIO import StringIO
-        s = StringIO()
-        import traceback
-        traceback.print_exc(file=s)
-        output = s.getvalue()
-        print(output, file=sys.stderr)
-    
+    if not environ['PATH_INFO'] or not environ['PATH_INFO'].lstrip('/'):
+        environ['PATH_INFO'] = "index.html"
         
-    status = '200 OK'
-#    output = "URL IS:<div>"+ geturl(environ) + "</div>"
-
-    response_headers = [('Content-type', 'text/plain'),
-                        ('Content-Length', str(len(output)))]
-    start_response(status, response_headers)
-
-    return [output]
+    return capp(environ, start_response)

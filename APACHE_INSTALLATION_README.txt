@@ -23,7 +23,7 @@ sudo apt-get install python-numpy python-scipy python-matplotlib
 
 SIMPLE README TESTED ON UBUNTU 14.04 with apache and mod_wsgi installed
 
-1) make (or edit, should be already there) caravan.wsgi file, if needed (it should not be the case)
+1) make (or edit, should be already in this directory) caravan.wsgi file, if needed (it should not be the case)
 see https://code.google.com/p/modwsgi/wiki/QuickConfigurationGuide
 
 2) control to have installed mod_wsgi in apache. Type in terminal: 
@@ -38,12 +38,22 @@ If not, then do:
 		sudo service apache2 start
 Check again if you see the two links above
 
-3) edit apache2.conf  
-(e.g. via sudo gedit /etc/apache2/apache2.conf. NOTE: superuser rights needed!!)
-the following lines:
+3) Create a file /etc/apache2/conf-available/caravan.conf  
+(NOTE: superuser rights needed!!)
+Add the following lines:
 	
 	WSGIScriptAlias /caravan /var/www/html/caravan/caravan.wsgi
+    WSGIApplicationGroup %{GLOBAL}
 	<Directory /var/www/html/caravan/>
 	Order allow,deny
 	Allow from all
 	</Directory> 
+
+Note that the second line (application group) is ESSENTIAL and its absence caused 
+many bugs resolved with the aid of peter evans and Javier Pastore
+
+4) Make a link in /etc/apache2/conf-enabled/caravan.conf pointing to
+the newly created file in conf-available 
+
+$) change ownership to files:
+    sudo chown -R www-data.www-data /var/www/html/caravan

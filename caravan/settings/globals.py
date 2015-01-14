@@ -16,6 +16,8 @@ version. For more information, see http://www.gnu.org/
 __author__="Riccardo Zaccarelli, PhD (<riccardo(at)gfz-potsdam.de>, <riccardo.zaccarelli(at)gmail.com>)" 
 __date__ ="$Oct 28, 2014 12:46:44 PM$"
 
+_DEBUG_=False #SET TO TRUE IF DEVELOPMENT VERSION, TO FALSE OTHERWISE!!!
+
 import sys
 _PY3 = True if sys.version_info.major == 3 else False
 

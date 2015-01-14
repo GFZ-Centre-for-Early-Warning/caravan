@@ -21,7 +21,8 @@ import traceback
 from cgi import parse_qs, escape #for parsing get method in main page (address bar)
 
 import time
-CARAVAN_DEBUG = False; #debug variable, as of Juli 2014 it controls whether exceptions in ResponseHandler should throw the traceback or simply an error message
+import caravan.settings.globals as glb
+CARAVAN_DEBUG = glb._DEBUG_; #debug variable, as of Juli 2014 it controls whether exceptions in ResponseHandler should throw the traceback or simply an error message
 
 
 import os
@@ -36,19 +37,18 @@ from caravan.core.core import caravan_run as run
 from caravan.core.runutils import RunInfo
 import mcerp
 import caravan.settings.globalkeys as gk
-import caravan.settings.globals as glb
 import caravan.fdsnws_events as fe
 import json, re
 CaravanApp = miniwsgi.App()
 
 #@CaravanApp.route(url='caravan/static/index.html', headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html', 
 #re.compile(r"\.(?:jpg|jpeg|bmp|gif|png|tif|tiff|js|css|xml)$", re.IGNORECASE)
-@CaravanApp.route(url=re.compile(r'(caravan/static/index.html|^$)'), headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html', 
+@CaravanApp.route(url='index.html', headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html', 
 def caravan_mainpage(request, response):
     return request.urlbody
-    #return open('caravan/static/index.html','rb')
-
-@CaravanApp.route(url='caravan/static/fdsn_query.html', headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html', 
+    
+    
+@CaravanApp.route(url='fdsn_query.html', headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html', 
 def fdsn_query(request, response):
     
     #when this is not a post request, print anyway the table. Therefore:
@@ -267,6 +267,7 @@ GM.session_id=%s""",(session_id,)) #(session_id,))
     #is present
     
     #Defined the columns to be set as properties (excluding geometry):
+    #Each column here corresponds to a leaflet Layer in JavaScript
     captions = {gk.MSI:2, gk.FAT:3, gk.ECL: 4} 
     
     def process(name, row, row_index):
@@ -299,17 +300,24 @@ GM.session_id=%s""",(session_id,)) #(session_id,))
     dataret = {"type": "FeatureCollection", "features": None, "captions": {k:"" for k in captions}}
     features = [] #pre-allocation doesn't seem to matter. See e.g. http://stackoverflow.com/questions/311775/python-create-a-list-with-initial-capacity
     
+    #set set of empty layers. As soon as we have a valid data 
+    #for a geocell g and a layer name N in the loop below, remove N from the 
+    #set defined below. This might be used JavaScript side to know immediately if a layer is empty
+    #or not, avoiding consuming memory 
+    empty_layers = {k for k in captions} #do a cpoy
+    
     for row in data:
         cell = {'geometry': row[0], 'id':row[1], 'type':'Feature', 'properties':{}}
         for name in captions:
             index = captions[name]
             data, value = process(name, row, index)
+            if name in empty_layers and not (data is None and value is None): empty_layers.remove(name)
             property = {'data': data, 'value': value}
             cell['properties'][name] = property
 
         features.append(cell)
     dataret['features'] = features
-#     dataret['percentiles_caption'] = glb.percentiles
+    dataret['emptyLayers'] = {k:True for k in empty_layers}
 
     return response.tojson(dataret)
 
@@ -482,30 +490,11 @@ def create_dict_js(): #FIXME: check compatibility with io in python3
     set_mtime(dest, check_sources)
 
 
- 
-# 
-# def create_dyn_file(filein, fileout, other_files, func):
-#     fileout="caravan.html"
-#     filein = "index.html"
-#     r = 3;
-#     if os.path.exists(fileout):
-#         t0 = round(os.path.getmtime(fileout),r)
-#         files = [filein, "globals.py", "settings.py", "static/libs/js/lang_dict.js"]
-#         #we need to round mtimes cause apparently thy are difference even if they "aren't"
-#         t = [round(os.path.getmtime(filename),r) if os.path.exists(filename) else t0-1 for filename in files]
-#         tmax = max(t)
-#         if t0 == tmax: #equal to tmax so that if we modified fileout itself, it rebuilds it
-#             return
-#         
-#     if CARAVAN_DEBUG: print("CREATING DYNAMIC FILE!!! t0="+str(t0)+" != tmax= "+str(tmax))
-#     func(filein, fileout)
-#     os.utime(fileout, (os.path.getatime(fileout), tmax)) #set ACCESS AND modification time
-#     if CARAVAN_DEBUG: print("t0= " + str(os.path.getmtime(fileout)))
-
-
 #execute files:
-create_main_page()
-create_dict_js()
-
-if(CARAVAN_DEBUG):
+#but only if in debug mode
+if CARAVAN_DEBUG:
+    #first change the current dir
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    create_main_page()
+    create_dict_js()
     print(str(CaravanApp))  
