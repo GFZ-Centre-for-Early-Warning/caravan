@@ -16,7 +16,7 @@ import sys, os, caravan_wsgi
 capp = caravan_wsgi.CaravanApp
 
 #CHANGE MATPLOT CONFIG DIR. HOPE IT WORKS 
-os.environ['MPLCONFIGDIR'] = "/var/www/caravan/matplotconfigdir"
+#os.environ['MPLCONFIGDIR'] = "/var/www/caravan/matplotconfigdir"
 
 #change dir. NOW
 os.chdir(os.path.dirname('caravan/static/index.html'))
