@@ -1,5 +1,5 @@
 INSTALLATION INSTRUCTIONS (TESTED ON UBUNTU 14.04 LTS WITH APACHE 2.4.7)
-KNOWN UNRESOLVED ISSUES IN lhotse21 (Ubuntu 12.04.5 LTS with Apache/2.2.22)
+KNOWN ISSUES IN lhotse21 (Ubuntu 12.04.5 LTS with Apache/2.2.22) (see below the solution)
 
 We assume python and apache are already installed (browse the internet in case, 
 it's straighforward)
@@ -83,6 +83,9 @@ sudo rsync -avru --delete /home/caravan /var/www
 (just for curiosity and avoid reduncancies, 
 needs still to check if the -v option makes sense with the --delete)
 
+7) Create a matplotlib if needed (Have a try via sudo tail..., see below, 
+and try to load the page. If the terminal prints errors due to matplotlib, see solution below)
+
 ================================================================================
 
 YOU CAN ALWAYS CHECK THE SERVER ERROR BY TYPING ON THE SERVER TERMINAL:
@@ -102,6 +105,13 @@ problem in Ubuntu 14.04 and Apache/2.4.7, NOT IN Ubuntu 12.04.5 LTS with Apache/
 In case of issues, see first http://stackoverflow.com/questions/9827377/setting-matplotlib-mplconfigdir-consider-setting-mplconfigdir-to-a-writable-dir
 and potentially modify caravan.wsgi os.environ (see caravan.wsgi)
 IT IS NEVERTHLESS STRONGLY SUGGESTED TO ADDRESS THIS PROBLEM TO APACHE EXPERTS ONLY
+
+FINAL SOLUTION:
+THE LINK ABOVE (STACKOVERFLOW) DID NOT WORK. MAYBE BECAUSE WE DO NOT EXPLICITLY IMPORT MATPLOTLIB
+BUT IT IS USED BY MCERP
+I SOLVED IN LHOTSE BY CREATING THE DIRECTORY LIKE THIS:
+sudo mkdir /var/www/.matplotlib
+sudo chown -r www-data.www-data /var/www/.matplotlib
 
 2) sometimes lxml is not installed (PYTHON PACKAGE):
 sudo apt-get install libxml2-dev libxslt-dev python-dev
