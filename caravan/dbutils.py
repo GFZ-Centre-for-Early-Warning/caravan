@@ -26,12 +26,15 @@ import select
 import socket #used to retreive if we are runnign on makalu, see below
 # via socket.gethostname()
 
+#WARNING: THESE OPTIONS ARE USELESS IF WITHIN CARAVAN APP.=====================
+#SEE FILE user_options.py
 _DEBUG_= 0
 ASYNC = 1
-HOST = 'makalu' #if "makalu" == socket.gethostname() else "makalu.gfz-potsdam.de" #'lhotse21.gfz-potsdam.de' #'localhost'
+HOST = 'localhost' #if "makalu" == socket.gethostname() else "makalu.gfz-potsdam.de" #'lhotse21.gfz-potsdam.de' #'localhost'
 DBNAME = 'caravan'
 USER = 'postgres'
 PSWD = 'postgres'
+#==============================================================================
 
 def wait(conn):
     """
