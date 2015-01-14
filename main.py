@@ -17,15 +17,21 @@ capp = caravan_wsgi.CaravanApp
 
 #CHANGE MATPLOT CONFIG DIR. HOPE IT WORKS 
 
-import tempfile
-os.environ['MPLCONFIGDIR'] = tempfile.mkdtemp() #"/var/www/caravan/matplotconfigdir"
-import matplotlib
-matplotlib.use('Agg')
+#import tempfile
+#os.environ['MPLCONFIGDIR'] = tempfile.mkdtemp() #"/var/www/caravan/matplotconfigdir"
+#import matplotlib
+#matplotlib.use('Agg')
+#import matplotlib.pyplot as plt
 
-#change dir. NOW
-os.chdir(os.path.dirname('caravan/static/index.html'))
+#change dir. NOW. Brutal, might be done with os.path.join, is just a test
+pt = os.path.realpath(__file__)
+#os.chdir(os.path.dirname(pt))
+#os.chdir(os.path.dirname('caravan/static/index.html'))
+os.chdir(os.path.join(os.path.dirname(pt),'caravan/static'))
+#print("ASD "+ os.getcwd())
     
 def application(environ, start_response):
+    #print("ASD"+os.getcwd())
     if not environ['PATH_INFO'] or not environ['PATH_INFO'].lstrip('/'):
         environ['PATH_INFO'] = "index.html"
         
