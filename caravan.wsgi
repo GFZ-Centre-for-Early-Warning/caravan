@@ -6,10 +6,5 @@ import sys
 
 sys.path.insert(0, '/var/www/html/caravan')
 
-
-#CHANGE MATPLOT CONFIG DIR. HOPE IT WORKS 
-os.environ['MPLCONFIGDIR'] = "/var/www/caravan/matplotconfigdir"
-
-
 import main
 application = main.application
