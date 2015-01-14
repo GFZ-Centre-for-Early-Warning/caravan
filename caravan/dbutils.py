@@ -28,7 +28,7 @@ import socket #used to retreive if we are runnign on makalu, see below
 
 _DEBUG_= 0
 ASYNC = 1
-HOST = 'localhost' #if "makalu" == socket.gethostname() else "makalu.gfz-potsdam.de" #'lhotse21.gfz-potsdam.de' #'localhost'
+HOST = 'makalu.gfz-potsdam.de' #if "makalu" == socket.gethostname() else "makalu.gfz-potsdam.de" #'lhotse21.gfz-potsdam.de' #'localhost'
 DBNAME = 'caravan'
 USER = 'postgres'
 PSWD = 'postgres'
