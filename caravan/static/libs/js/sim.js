@@ -436,12 +436,15 @@ jQuery(document).ready(function () {
             setRunText('run_text');
             $runBtn.off('click').click(startRun);
         });
-    }
+    };
     
     $runBtn.click(startRun);
     
     sim.registerListener('status', function (oldState, newState) {
     	$runBtn.prop('disabled', newState === sim.STARTING || newState === sim.STOPPING);
+        //hide toolbar buttons to avoid weird behaviours (e.,g. changing dict, showing help)
+        //which are all stuff complex to handle and which are likely to appear as bug even if they aren't:
+        $('.banner').find('.toolbar').css("visibility",newState === sim.READY ? "" : "hidden");
         $runBtn.off('click');
         //as this method is called when the state changes, oldState is never READY so we can safely assume
         //we need to go back now:

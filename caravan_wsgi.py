@@ -230,46 +230,51 @@ def query_simulation_data(request, response):
     #which need to be converted to double prior to json dumps
 
     data = conn.fetchall("""SELECT 
-ST_AsGeoJSON(ST_Transform(G.the_geom,4326))::json AS geometry, GM.geocell_id, GM.ground_motion, risk.social_conseq.fatalities_prob_dist
+ST_AsGeoJSON(ST_Transform(G.the_geom,4326))::json AS geometry, GM.geocell_id, GM.ground_motion, risk.social_conseq.fatalities_prob_dist, risk.econ_conseq.total_loss
 FROM 
 processing.ground_motion as GM
 LEFT JOIN 
 risk.social_conseq ON (risk.social_conseq.geocell_id = GM.geocell_id and risk.social_conseq.session_id = GM.session_id)
 LEFT JOIN 
+risk.econ_conseq ON (risk.econ_conseq.geocell_id = GM.geocell_id and risk.econ_conseq.session_id = GM.session_id)
+LEFT JOIN 
 exposure.geocells as G ON (G.gid = GM.geocell_id)
 WHERE 
-GM.session_id=%s""",(session_id,)) #(session_id,))
+GM.session_id=%s""",(session_id,)) 
 
     #conn.conn.commit()
     conn.close()
     
     #HYPOTHESES:
-    #1) The query above returns a table T.
-    #2) a single T row (R) corresponds to a geojson feature F
-    #3) A geojson feature F has the fields
+    #1) The query above returns a table T whose header (columns) are:
+    #    | geometry | geocell_id | ground_motion | fatalities_prob_dist | total_loss
+    #
+    #2) a single T row (R) corresponds to a geojson feature F:
     #{
-    #    type: 'Feture', 
-    #    gemoetry : dict, 
-    #    id: number_or_string, 
+    #    type: 'Feture', //geojson standard string (see doc)
+    #    geometry : dict, //associated to geometry column
+    #    id: number_or_string, //associated to geocell_id column
     #    properties:{
-    #       key1: {data: usually_array, value:numeric_scalar},
-    #       ...
-    #       keyN: {data: usually_array, value:numeric_scalar},
+    #       gk.MSI: {data: usually_array, value:numeric_scalar}, //associated to ground_motion column
+    #       gk.FAT: {data: usually_array, value:numeric_scalar}, //associated to fatalities_prob_dist column
+    #       gk.ECL: {data: usually_array, value:numeric_scalar}  //associated to total_loss column
     #    }
     #}   
-    #4) each R contains AT LEAST the field 'geometry' AT INDEX 0 (see query above)
-    #and the id field at index 1
-    #5) Any other column of R will be set as key of field 'properties' of F, the table value
-    # will be associated to the data property key, and value is user-defined (see below)
-    # 
-    #6) captions are attached to the parent object wrapping eeach feature and 
-    #will be used to check whether the data for a oparticular layergroup
-    #is present
+    # gk.MSI, gk.FAT and gk.MSI.ECL refer to globalkeys global variables. They are just strings 
+    # but defined globally for multi-purpose usage
+    # 3) EACH PROPERTIES FIELD HAS TWO VALUES, DATA AND VALUE. WHICH WILL BE CALCULATED FROM ANY DATABASE ROW IN 
+    # THE FUNTION process DEFINED BELOW. DATA IS MEANT TO BE AN ARRAY OF DATA TO BE VISUALIZED WHEN MOUSE IS
+    # OVER THE RELATIVE GEOCELL ON THE MAP, WHEREAS VALUE IS THE VALUE TO BE VISUALIZED BY MEANS OF E.G. A COLOR
+    # FOR A PARTICULAR GEOCELL. Example: given a set of data bins representing the distribution at some values, e.g. [0.2, 0.5, 0.3],
+    # then properties.data is that array, and value might be e.g., the median, or the max, or the index of max, or whatever
+    # (the important thing is that JavaScript side one knows what are data and value in order to display them on the map)
     
-    #Defined the columns to be set as properties (excluding geometry):
+    #NOW we define the columns to be set as properties (excluding geometry):
     #Each column here corresponds to a leaflet Layer in JavaScript
+    #associating each of them to a table column index (see 1) in comment above):
     captions = {gk.MSI:2, gk.FAT:3, gk.ECL: 4} 
     
+    #THIS IS THE MAIN FUNCTION
     def process(name, row, row_index):
         try:
             data = row[row_index]
@@ -311,6 +316,7 @@ GM.session_id=%s""",(session_id,)) #(session_id,))
         for name in captions:
             index = captions[name]
             data, value = process(name, row, index)
+            #remove the empty layers key if data is valid:
             if name in empty_layers and not (data is None and value is None): empty_layers.remove(name)
             property = {'data': data, 'value': value}
             cell['properties'][name] = property
@@ -321,9 +327,17 @@ GM.session_id=%s""",(session_id,)) #(session_id,))
 
     return response.tojson(dataret)
 
+#.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
+# FROM HERE ON FUNCTIONS FOR CREATING THE MAIN HTML PAGE AND THE DICTIONARY.JS JAVASCRIPT FILE
+# ALL THIS CODE WILL BE EXECUTED ONLY IF the global debug variable is False, which is always True unless
+# you dind't run this file from within manage.py
+# THE MAIN PAGE AND THE DICTIONARY JS FILE ARE CREATED IF THERE IS THE NEED TO DO THEM, I.E. SOME FILES 
+# HAVE BEEN MODIFIED OR ADDED
+#.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:
 
 def _mtime(file, files):
-    r = 3;
+    "returns the modification time of file according to files. None means file needs not to be updated acccording to files"
+    r = 3; #round number for modification time (see belo)
     t = (round(os.path.getmtime(filename),r) if os.path.exists(filename) else None for filename in files)
     tmax = None
     for tt in t:
@@ -339,7 +353,6 @@ def _mtime(file, files):
     return None if t0==tmax else tmax
 
 
-"returns the modification time of file according to files. "
 def needs_update(file, files):
     return _mtime(file, files) is not None
 
