@@ -1,9 +1,12 @@
-INSTALLATION INSTRUCTIONS (TESTED ON UBUNTU 12.04 LTS)
+INSTALLATION INSTRUCTIONS (TESTED ON UBUNTU 14.04 LTS WITH APACHE 2.4.7)
+KNOWN UNRESOLVED ISSUES IN lhotse21 (Ubuntu 12.04.5 LTS with Apache/2.2.22)
 
 We assume python and apache are already installed (browse the internet in case, 
 it's straighforward)
 
+--------------------------------------
 REQUIRED PYTHON LIBRARIES INSTALLATION
+--------------------------------------
 
 #install psycopg2
 sudo apt-get install python-psycopg2
@@ -20,11 +23,13 @@ sudo apt-get install python-pip
 sudo apt-get install python-numpy python-scipy python-matplotlib
 #(and re-type pip install mcerp)
 
-#check if lxml is installed (see st the bottom, it wasn't in lhotse)
+#check if lxml is installed (see at the bottom, it wasn't in lhotse21)
 
-SIMPLE README TESTED ON UBUNTU 14.04 with apache and mod_wsgi installed
+--------------------------------------
+WEB APP APACHE INSTALLATION
+--------------------------------------
 
-1) make (or edit, should be already in this directory) caravan.wsgi file, if needed (it should not be the case)
+1) Edit, IF NEEDED, caravan.wsgi file:
 see https://code.google.com/p/modwsgi/wiki/QuickConfigurationGuide
 
 2) control to have installed mod_wsgi in apache. Type in terminal: 
@@ -68,7 +73,7 @@ the newly created file in conf-available
 
 5) change ownership to files:
     sudo chown -R www-data.www-data /var/www/html/caravan
-where the last argument is the site folder (here we use the one provided above, but might be changed)
+where the last argument is the site folder (here we use the one provided above, provide your one if different)
 
 6) create a caravan directory according to the path specified above 
 (/var/www/html/caravan/ in the example). In lhotse for instance, everything is 
@@ -83,15 +88,27 @@ needs still to check if the -v option makes sense with the --delete)
 YOU CAN ALWAYS CHECK THE SERVER ERROR BY TYPING ON THE SERVER TERMINAL:
 sudo tail -f /var/log/apache2/error.log
 and then go to a browser and reload
+The terminal then shows server errors
 
-ADDITIONAL STUFF:
-1) Just as reminder: no caravan under /home? or want to clone somewhere else? then remember to use https:
-    git clone https://github.com/GFZ-Centre-for-Early-Warning/caravan
-will create the caravan folder in current dir
+KNOWN ISSUES:
 
-2) CHANGE MATPLOTLIB DIR:
-    modify caravan.wsgi os.environ (see caravan.wsgi)
+1) MCERP and MATPLOTLIB PROBLEMS (DERIVED FROM MCERP USING IT)
+mcerp has problems with apache2. It seems that by using matplotlib, the latter
+writes directories for which we need permissions.
 
-2) INSTALL LXML (PYTHON PACKAGE)
+The line WSGIApplicationGroup %{GLOBAL} in the apache caravan config file for apache seems to solve the
+problem in Ubuntu 14.04 and Apache/2.4.7, NOT IN Ubuntu 12.04.5 LTS with Apache/2.2.22
+
+In case of issues, see first http://stackoverflow.com/questions/9827377/setting-matplotlib-mplconfigdir-consider-setting-mplconfigdir-to-a-writable-dir
+and potentially modify caravan.wsgi os.environ (see caravan.wsgi)
+IT IS NEVERTHLESS STRONGLY SUGGESTED TO ADDRESS THIS PROBLEM TO APACHE EXPERTS ONLY
+
+2) sometimes lxml is not installed (PYTHON PACKAGE):
 sudo apt-get install libxml2-dev libxslt-dev python-dev
 sudo pip install lxml
+Browse the internet for installing missing packages, if any. the /var/log/apache2/error.log file should warn for it (see above)
+
+
+Final note (just as reminder): no caravan under /home? or want to clone somewhere else? then remember to use https for lhotse21:
+    git clone https://github.com/GFZ-Centre-for-Early-Warning/caravan
+will create the caravan folder in current dir

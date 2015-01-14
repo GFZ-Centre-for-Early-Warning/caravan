@@ -4,7 +4,7 @@
 import os
 import sys	
 
-sys.path.insert(0, '/var/www/html/caravan')
+sys.path.insert(0, '/var/www/caravan')
 
 import main
 application = main.application
