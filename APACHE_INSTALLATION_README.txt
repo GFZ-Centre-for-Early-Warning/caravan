@@ -73,7 +73,7 @@ where the last argument is the site folder (here we use the one provided above, 
 6) create a caravan directory according to the path specified above 
 (/var/www/html/caravan/ in the example). In lhotse for instance, everything is 
 under /home/caravan (it's a git repository also). After pulling from therein potential changes, 
-just run: 
+just run (check paths! is an example): 
 sudo rsync -avru --delete /home/caravan /var/www
 (just for curiosity and avoid reduncancies, 
 needs still to check if the -v option makes sense with the --delete)
@@ -89,9 +89,8 @@ ADDITIONAL STUFF:
     git clone https://github.com/GFZ-Centre-for-Early-Warning/caravan
 will create the caravan folder in current dir
 
-2) MAKE MATPLOTLIB DIR WITH RIGHT PERMISSIONS:
-    $ sudo mkdir /var/www/.matplotlib
-    $ sudo chown -R www-data.www-data /var/www/.matplotlib/
+2) CHANGE MATPLOTLIB DIR:
+    modify caravan.wsgi os.environ (see caravan.wsgi)
 
 2) INSTALL LXML (PYTHON PACKAGE)
 sudo apt-get install libxml2-dev libxslt-dev python-dev
