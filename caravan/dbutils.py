@@ -34,6 +34,7 @@ HOST = 'localhost' #if "makalu" == socket.gethostname() else "makalu.gfz-potsdam
 DBNAME = 'caravan'
 USER = 'postgres'
 PSWD = 'postgres'
+PORT = 5432
 #==============================================================================
 
 def wait(conn):
@@ -60,14 +61,14 @@ def wait(conn):
         else:
             raise psycopg2.OperationalError("poll() returned %s" % state)
 
-def connect(host=HOST, dbname=DBNAME, user=USER,  password=PSWD, async=ASYNC):
+def connect(host=HOST, port=PORT, dbname=DBNAME, user=USER,  password=PSWD, async=ASYNC):
     """
         Returns the psycopg connection with given arguments, which default if
         missing to the relative globally defined variables. The returned object
         can be passed to the functions of these module or as psycopg2 connection
     """
     #see http://initd.org/psycopg/docs/advanced.html#asynchronous-support
-    aconn = psycopg2.connect(host=host, dbname=dbname, user=user,  password=password, async=async)
+    aconn = psycopg2.connect(host=host, port=port, dbname=dbname, user=user,  password=password, async=async)
     if async:
         if _DEBUG_:
             print("waiting (async=1)")
@@ -155,13 +156,14 @@ class Connection(object):
         If this class is too "hight level" and you know what you are doing, you can always 
         use C by calling Connection.conn
     """
-    def __init__(self, host=HOST, dbname=DBNAME, user=USER,  password=PSWD, async=ASYNC):
+    def __init__(self, host=HOST, port=PORT, dbname=DBNAME, user=USER,  password=PSWD, async=ASYNC):
 #        self.host = host
+#	 self.port = port
 #        self.async = async
 #        self.password = password
 #        self.dbname = dbname
 #        self.user = user
-        self.conn = connect(host=host, dbname=dbname, user=user,  password=password, async=async)
+        self.conn = connect(host=host, port=port, dbname=dbname, user=user,  password=password, async=async)
         
     def cursor(self, operation, parameters=None):
         """

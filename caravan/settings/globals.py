@@ -97,8 +97,8 @@ def imgpath():
     return 'imgs/'
 
 #default connection class:
-def connection(host=opts.DB_HOST, dbname=opts.DB_NAME, user=opts.DB_USER,  password=opts.DB_PSWD, async=opts.DB_ASYNC):
-    return dbutils.Connection(host, dbname, user, password, async)
+def connection(host=opts.DB_HOST, port=opts.DB_PORT, dbname=opts.DB_NAME, user=opts.DB_USER,  password=opts.DB_PSWD, async=opts.DB_ASYNC):
+    return dbutils.Connection(host, port, dbname, user, password, async)
 
 #gmpes:
 #Note that the value will affect also the param ipe interval (see below)
