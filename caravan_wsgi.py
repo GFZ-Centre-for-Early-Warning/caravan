@@ -438,6 +438,7 @@ def create_dict_js(): #FIXME: check compatibility with io in python3
     
     gmpez = {g.__name__ : g for g in glb.def_gmpes.values()}
     
+    
     for f in files:
         mod_name,file_ext = os.path.splitext(os.path.split(f)[-1])
 
@@ -445,15 +446,10 @@ def create_dict_js(): #FIXME: check compatibility with io in python3
         
         
         full_name = os.path.splitext(f)[0].replace(os.path.sep, '.')
-#         print("{0} full path: {1}".format(mod_name, full_name))
-        
         py_mod = import_module(full_name)
-        
-#         print("modname: "+py_mod.__name__)
-        
         py_mod_dir = dir(py_mod)
-#         print("dir: "+str(py_mod_dir))
-
+        
+        
         if first: first=False
         else: fout.write(",\n")
         
@@ -478,9 +474,6 @@ def create_dict_js(): #FIXME: check compatibility with io in python3
                 val = val+"<br>"+py_mod.__dict__["_ipe_mag_bounds_text"] + str(list(ge.m_bounds))+"<br>"+py_mod.__dict__["_ipe_dist_bounds_text"] + str(list(ge.d_bounds))+("<br><i>"+ge.ref+"</i>" if ge.ref else "")
             
             var  = _quote_(val)
-            
-            #"[{}]".format(','.join(_quote_(str(v)) for v in val)) if hasattr(val, "__iter__") else '""' if val is None else _quote_(str(val))
-
             
             fout.write(k)
             fout.write(" : ")

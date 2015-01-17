@@ -658,8 +658,12 @@
 			<div class="v-wrapper">
 				<div class="v-layout-top">
 					<div class="title">Query event from Catalog 
-					<a id="_qe_close_btn" style="float:right" href="#"><img title="close" src="{% imgpath %}close.png"></a>
-					</div>
+					<!-- this was the close button. Hide it cause otherwise the fdsn event query dialog seems a window,
+                        and in fact it has a popup behavior (e.g., hide it on focus lost). If you want to uncomment it,
+                         you need to implement also the hide action (the anchor below is not attached to any event)
+                        <a id="_qe_close_btn" style="float:right" href="#"><img title="close" src="{% imgpath %}close.png"></a>
+					-->
+                    </div>
 				</div>
 				<div class="v-layout-center">
 					<div id="_qe_left" class="h-layout-left">
