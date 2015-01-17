@@ -31,7 +31,6 @@
         <script src="libs/js/legend.js" type="text/javascript"></script>
         <script type="text/javascript">
             var $ = jQuery;
-            var mapm; //to define it globally NOW
             $(document).ready(function () {
             	var crv = caravan;
 				
@@ -186,6 +185,11 @@
 						$('#'+k).val(data[k]);
 					}
 					$('#_qe_container').popClose();
+                    
+                    //force repositioning of the epicenter
+                    //(should work, the text fields don't raise any event though)
+                    caravan.map.centerEpicenter();
+                    
         			return false; //for anchors
                 });
                 
@@ -684,16 +688,16 @@
 													<input id="{% LAT %}_eqc" type="checkbox">
 													<label data-title="{% LAT %}" for="{% LAT %}_eqc" class="notSelectable"></label>
 												</td>
-												<td><input name="{% LAT %}" value="{% LAT.default %}"></td>
-												<td><input name="{% LAT %}" value="{% LAT.default %}"></td>
+												<td><input name="{% LAT %}" value="{% FDSN_LAT_MIN %}"></td>
+												<td><input name="{% LAT %}" value="{% FDSN_LAT_MAX %}"></td>
 											</tr>
 											<tr>
 												<td>
 													<input id="{% LON %}_eqc" type="checkbox">
 													<label data-title="{% LON %}" for="{% LON %}_eqc" class="notSelectable"></label>
 												</td>
-												<td><input name="{% LON %}" value="{% LON.default %}"></td>
-												<td><input name="{% LON %}" value="{% LON.default %}"></td>
+												<td><input name="{% LON %}" value="{% FDSN_LON_MIN %}"></td>
+												<td><input name="{% LON %}" value="{% FDSN_LON_MAX %}"></td>
 											</tr>
 											<tr>
 												<td>
