@@ -162,6 +162,15 @@ scenario_db_cols = {
     "the_geom":15, #;"USER-DEFINED"
 }
 
+#defining the fdsn events default values. These might be different than each parameter 
+#'default' key (see below) as the user has to be redirected by default on a specific geographic rectangle
+#(to be defined here below):
+FDSN_LAT_MIN=1
+FDSN_LAT_MAX=2
+FDSN_LON_MIN=3
+FDSN_LON_MAX=4
+
+
 #parameters (input parameters for simulation query, event query etcetera)
 #Last in the module because it makes use also of other module-level variables (gmnpes for instance)
 #the infos stored in the following items will be used throughout the code

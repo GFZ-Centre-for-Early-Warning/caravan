@@ -552,7 +552,7 @@
         //internal function which centers the map including the epicenter on
         //input changes
         var me = this; //see below why
-        var centerEpicenter = function() {
+        this.centerEpicenter = function() {
             //consider the case where we typed a two element value, such as: 75.5 0.6
             var reg = /(?:,\s;)/;
 
@@ -574,10 +574,10 @@
         //however, two events are sufficient (see http://stackoverflow.com/questions/5494648/catching-all-changes-to-the-contents-of-an-input-box-using-javascript-jquery/5494697#5494697)
         //Note in any case that it will NOT fire when we programmatically set the val() attribute
         $(latId).add($(lonId)).on('input propertychange', function () {
-            centerEpicenter(); //this is the clicked component. centerEpicenter has a ref on this so we call this mapmanager centerEpicenter
+            me.centerEpicenter(); //this is the clicked component. centerEpicenter has a ref on this so we call this mapmanager centerEpicenter
         });
        //this is the window object. centerEpicenter has a ref on this so we call this mapmanager centerEpicenter
-        centerEpicenter(); //programmatically starts centering
+        me.centerEpicenter(); //programmatically starts centering
         
         //====================================================================================== 
         var _events={};

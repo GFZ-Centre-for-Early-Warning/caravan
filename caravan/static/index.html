@@ -31,7 +31,6 @@
         <script src="libs/js/legend.js" type="text/javascript"></script>
         <script type="text/javascript">
             var $ = jQuery;
-            var mapm; //to define it globally NOW
             $(document).ready(function () {
             	var crv = caravan;
 				
@@ -186,6 +185,11 @@
 						$('#'+k).val(data[k]);
 					}
 					$('#_qe_container').popClose();
+                    
+                    //force repositioning of the epicenter
+                    //(should work, the text fields don't raise any event though)
+                    caravan.map.centerEpicenter();
+                    
         			return false; //for anchors
                 });
                 
@@ -684,16 +688,16 @@
 													<input id="lat_eqc" type="checkbox">
 													<label data-title="lat" for="lat_eqc" class="notSelectable"></label>
 												</td>
-												<td><input name="lat" value="42.87"></td>
-												<td><input name="lat" value="42.87"></td>
+												<td><input name="lat" value="1"></td>
+												<td><input name="lat" value="2"></td>
 											</tr>
 											<tr>
 												<td>
 													<input id="lon_eqc" type="checkbox">
 													<label data-title="lon" for="lon_eqc" class="notSelectable"></label>
 												</td>
-												<td><input name="lon" value="74.6"></td>
-												<td><input name="lon" value="74.6"></td>
+												<td><input name="lon" value="3"></td>
+												<td><input name="lon" value="4"></td>
 											</tr>
 											<tr>
 												<td>
