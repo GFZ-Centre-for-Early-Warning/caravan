@@ -408,7 +408,7 @@ from importlib import import_module
 from types import ModuleType
 # import lang.default as lang_default
 def create_dict_js(): #FIXME: check compatibility with io in python3
-    DEFAULT_LANG = "en" #move from here?
+    DEFAULT_LANG = glb.DEFAULT_APP_LANG 
     dict_dir = "caravan/settings/lang"
     files = [ os.path.join(dict_dir,f) for f in os.listdir(dict_dir) if os.path.splitext(f)[1].lower() == '.py' ] #os.path.isfile(os.path.join(dict_dir,f)) ]
     

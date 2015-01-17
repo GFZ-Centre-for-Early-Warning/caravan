@@ -170,6 +170,12 @@ FDSN_LAT_MAX=2
 FDSN_LON_MIN=3
 FDSN_LON_MAX=4
 
+#the default language to be used in the application
+#when changed, change also the modification time of one of the .py files in caravan/settings/lang
+#and launch from the main caravan dir: 
+#python manage.py o
+#for updating the js dict file
+DEFAULT_APP_LANG="en"
 
 #parameters (input parameters for simulation query, event query etcetera)
 #Last in the module because it makes use also of other module-level variables (gmnpes for instance)
