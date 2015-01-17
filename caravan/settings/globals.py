@@ -165,10 +165,10 @@ scenario_db_cols = {
 #defining the fdsn events default values. These might be different than each parameter 
 #'default' key (see below) as the user has to be redirected by default on a specific geographic rectangle
 #(to be defined here below):
-FDSN_LAT_MIN=1
-FDSN_LAT_MAX=2
-FDSN_LON_MIN=3
-FDSN_LON_MAX=4
+FDSN_LAT_MIN=38.5
+FDSN_LAT_MAX=44
+FDSN_LON_MIN=68.5
+FDSN_LON_MAX=81
 
 #the default language to be used in the application
 #when changed, change also the modification time of one of the .py files in caravan/settings/lang

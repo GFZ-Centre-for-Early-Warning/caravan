@@ -372,7 +372,7 @@
                     opts.yaxis.ticks = [[0, "0%"],[.25, "25%"],[.5, "50%"],[0.75, "75%"],[1, "100%"]];
                       
                     //setup flot chart:
-                    var $placeholder = $('<div>').addClass("flot-placeholder").css({'width':200,'height':150}).appendTo($cont);
+                    var $placeholder = $('<div>').addClass("flot-placeholder").css({'width':300,'height':200}).appendTo($cont);
                     //flot complains if the div has no size, this might be due to
                     //the element being hidden, therefore we first add the element
                     //This is done in 3 steps:
@@ -692,16 +692,16 @@
 													<input id="lat_eqc" type="checkbox">
 													<label data-title="lat" for="lat_eqc" class="notSelectable"></label>
 												</td>
-												<td><input name="lat" value="1"></td>
-												<td><input name="lat" value="2"></td>
+												<td><input name="lat" value="38.5"></td>
+												<td><input name="lat" value="44"></td>
 											</tr>
 											<tr>
 												<td>
 													<input id="lon_eqc" type="checkbox">
 													<label data-title="lon" for="lon_eqc" class="notSelectable"></label>
 												</td>
-												<td><input name="lon" value="3"></td>
-												<td><input name="lon" value="4"></td>
+												<td><input name="lon" value="68.5"></td>
+												<td><input name="lon" value="81"></td>
 											</tr>
 											<tr>
 												<td>

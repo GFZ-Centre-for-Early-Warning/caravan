@@ -46,4 +46,4 @@ DB_HOST = 'localhost' #if "makalu" == socket.gethostname() else "makalu.gfz-pots
 DB_NAME = 'caravan'
 DB_USER = 'postgres'
 DB_PSWD = 'postgres'
-DB_PORT = 5433
+DB_PORT = 5432

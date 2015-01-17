@@ -144,62 +144,62 @@ globals()[gk.DNP] = [
 globals()[gk.TES] = [
 	'tessellation(s)',
  	'Tessellation(s)',
- 	'Choose the target tessellations (multiple selection allowed)',
+ 	'Выберите целевые мозаик (множественный выбор допускаются)',
 ]
 globals()[gk.AOI] = [
-	"Area",
-	'Area',
+	"площадь",
+	'площадь',
  	'', #not used (see aoi_... variables below
 ]
 _iref = 'I<sub>ref</sub>'
 globals()[gk.AIR] =[
-	"intensity reference",
+	"ориентиром в интенсивности",
 	_iref,
-	'Intensity reference (Area = circle around epicenter where intensity &ge; '+_iref+')',
+	'Ссылка Интенсивность (площадь = круг вокруг эпицентра, где интенсивность &ge; '+_iref+')',
 ]
 globals()[gk.AKS] = [
-	"A("+_iref+") step",
-	'A('+_iref+ ') step [Km]',
-	'Choose the step (in Km) used in the computation of the target Area (circle around epicenter where intensity &ge; '+_iref+ ')',
+	"A("+_iref+") шаг",
+	'A('+_iref+ ') шаг [км]',
+	'Выберите этап (в км), используемый при расчете целевой зоны (круг вокруг эпицентра, где интенсивность &ge; '+_iref+ ')',
 ]
 
 #docs for I.P.E's. The doc will be built in caravan_wsgi according to this strings, using also dist_bounds string 
 #mag_bounds string defined below. If you implement a new IPE, simply write the class name here with a relative doc string
-GlobalWaHyp = "Global Intensity prediction Equation, based on hypocentral distance"
-GlobalWaRup = "Global Intensity prediction Equation, based on rupture distance"
-CentralAsiaEmca = "Central Asia Intensity prediction Equation, based on epicentral distance"
+GlobalWaHyp = "Глобальный Уравнение прогнозирования интенсивности, основанный на гипоцентральной расстоянии"
+GlobalWaRup = "Глобальный Уравнение прогнозирования интенсивности, в зависимости от расстояния разрыва"
+CentralAsiaEmca = "Центральная Азия прогноз интенсивности Уравнение, основанный на эпицентральной расстояния"
 
-_ipe_dist_bounds_text = "Distance bounds: "
-_ipe_mag_bounds_text = "Magnitude bounds: "
+_ipe_dist_bounds_text = "Расстояние границы: "
+_ipe_mag_bounds_text = "амплитудные оценки: "
 
 #General labels for the caravan app
-_event_parameters = "Event Parameters"
+_event_parameters = "Параметры события"
 event_params_text = _event_parameters
-model_params_text = "Model Parameters"
-advanced_text = ["advanced","Advanced","Toggle advanced settings visibility"]
+model_params_text = "параметров модели"
+advanced_text = ["продвинутый","продвинутый","Переключить расширенные настройки видимости"]
 
-run_text = ["run", "Run", "Start simulation with the given parameters"]
-cancel_text = ["cancel", "Cancel", "Cancel running simulation"]
-goback_text = ["go back", "Go back", "Restore parameter window"]
+run_text = ["пробег", "пробег", "Начать имитацию с заданными параметрами"]
+cancel_text = ["отменить", "отменить", "Ансель работает моделирование"]
+goback_text = ["возвращаться", "возвращаться", "Восстановить окно параметров"]
 
-source_point_text = "Point"
-source_extended_text = "Extended"
-aoi_intensity_ref= ["area of interest (according to intensity reference)",
-                         "where I &ges; " + _iref,
-                         "Perform calculations only on the area where intensity assessment is greater than "+_iref+ " (see '"+advanced_text[1]+"')"]
-aoi_map_rect=["","Map current rect.","Perform calculations only on the area currently displayed in the map"]
+source_point_text = "точка"
+source_extended_text = "расширенный"
+aoi_intensity_ref= ["область интересов (по ссылке интенсивности)",
+                         "где я &ges; " + _iref,
+                         "Выполнение вычислений только на площади, где оценка интенсивности больше, чем "+_iref+ " (видеть '"+advanced_text[1]+"')"]
+aoi_map_rect=["","Карта текущий прямоугольник.","Выполнение вычислений только на площади в данный момент отображается на карте"]
 
 #Not translated into chinese:
-globals()[gk.MSI] = "Macroseismic Intensity"
-globals()[gk.FAT] = "Fatalities"
-globals()[gk.ECL] = "Economic losses"
-show_info = "show help when moving to a component"
-query_events_from_catalog = "Query historical event from catalog and set it in the "+event_params_text
-hide_panel = "Hide panel"
-show_panel = "Show panel"
+globals()[gk.MSI] = "Макросейсмическое Интенсивность"
+globals()[gk.FAT] = "Погибшие"
+globals()[gk.ECL] = "Экономические потери"
+show_info = "показать помощь при переезде к компоненту"
+query_events_from_catalog = "Запрос историческое событие из каталога и установить его в "+event_params_text
+hide_panel = "Скрыть панель"
+show_panel = "Показать панель"
 
-query_events = ["query events", "Query events", "Query events from the selected catalog matching the given criteria"]
-choose_selected_event = ["choose selected event", "Choose selected", "Choose selected event and input its values in the "+_event_parameters]
+query_events = ["события запроса", "события запроса", "События запрос от выбранного каталога, соответствующих критериям"]
+choose_selected_event = ["выбрать выбранное событие", "Выберите selecte", "Выберите выбранное событие и введите значения в "+_event_parameters]
 
 
 
