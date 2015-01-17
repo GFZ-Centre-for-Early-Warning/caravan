@@ -262,7 +262,7 @@ class Gmpe(object):
             raise Exception('{0} error: missing magnitude'.format(self.__repr__()))
         
         if self.m > self.m_bounds[1] or self.m < self.m_bounds[0]:
-            raise Exception("{0} error: magnitude not in {2}".format(self.__repr__(), str(list(self.m_bounds) ) )) #because list str is like closed interval in math
+            raise Exception("{0} error: magnitude not in {1}".format(self.__repr__(), str(list(self.m_bounds) ) )) #because list str is like closed interval in math
         
         
         #add spf if slip is present and not sof
