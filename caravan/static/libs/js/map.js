@@ -277,7 +277,7 @@
                 	}
                 	var $l = $('<label>').append($radio).append($('<span>').attr('data-title',name).html(crvn.dict.title(name)));
                 	_div.find('#leaflet-layer-switcher').append($l);
-            	}
+            	};
             }
             return new Control();
         })();
@@ -658,37 +658,37 @@
     
             $.post('query_simulation_data', JSON.stringify({session_id: session_id}), function (data, textStatus, jqXHR) {
                 
-//                function resetHighlight(mouseEvent) {
-//                    //mouseEvent is a mouse event leaflet object, see
-//                    //http://leafletjs.com/reference.html#event-objects
-//                    gmpeLayer.resetStyle(mouseEvent.target);
-//                    if (gmpechart.is(':visible')) {
-//                        gmpechart.hide();
-//                    }
-//                }
-//    
-//                function onEachFeatureFcn(feature, layer) {
-//                    layer.on({
-//                        //click: showPopup,
-//                        mouseover: highlightFeature,
-//                        mouseout: resetHighlight
-//    //                    click: zoomToFeature
-//                    });
-//                }
-
                 var n;
                 
                 for(n in _layers){
                 	me.removeData(n);
                 }
                 
-                if (!data.features || !data.features.length) {
+                if(!data){return;}
+                
+                var feats = data.features;
+                if (!feats || !feats.length) {
                     return;
                 }
-    
+                
+                //NOTE: locally (in ubuntu 14.04, python 2.7.6 at least) each feats element has the 
+                //key 'geometry' as valid geoJson OBJECT. In other circumstances (eg. lhotse, python 2.7.3 I guess)
+                //it is in string format, as if it was stringified once more and therefore here it's back
+                //to its original value (as set server side, see caravan_wsgi query_simulation_data function). 
+                //That's weird, the 'best' solution is to use the browser JSON parse function. Brutal maybe, but it works
+                //(Json is implemented in all major browsers, including IE8+)
+                var first = feats[0];
+                if(typeof first.geometry === 'string'){
+                    var flen = feats.length;
+                    var parsefunc = JSON.parse; //declare once (should be faster)
+                    for(var i=0; i < flen; i++){
+                        feats[i].geometry = parsefunc(feats[i].geometry);
+                    }
+                }
+                
                 for(n in _layers){
                 	if(n in data.captions){
-                		me.addData(n, data.features);
+                		me.addData(n, feats);
                 	}
                 }
                 

@@ -570,7 +570,7 @@ def getjson(environ):
     if PY3: #convert to unicode, which is the default string type. Otherwise it complains that it has byte strings
         #(py2 does not complain because byte strings are the default)
         request_body = request_body.decode('utf-8')
-    event = json.loads(request_body) 
+    event = json.loads(request_body)
     #event contains unicode data now (default in json module)
     return event
 
