@@ -179,7 +179,7 @@ __date__ ="$Jun 23, 2014 1:15:27 PM$"
 #Client: Send Request and Receive Response
 
 
-_DEBUG_ = True; #debug variable, as of Juli 2014 it controls whether exceptions should be printed on terminal, along with other messages
+_DEBUG_ = False; #debug variable, as of Juli 2014 it controls whether exceptions should be printed on terminal, along with other messages
 
 #Code copied from WebOP:
 
@@ -560,8 +560,13 @@ def getjson(environ):
         Note that elements are unicode strings, which is not the default in Python 2x
     """
     #copied from WSGI + jQuery example
-    request_body_size = int(environ["CONTENT_LENGTH"])
-    request_body = environ["wsgi.input"].read(request_body_size) #FIXME: closes the stream? Theoretically, in python2 no! check
+    try:
+        request_body_size = int(environ["CONTENT_LENGTH"])
+        request_body = environ["wsgi.input"].read(request_body_size) #FIXME: closes the stream? Theoretically, in python2 no! check
+    except:
+        #why is environ['CONTENT_LENGTH] empty?? in this case just read all:
+        request_body = environ["wsgi.input"].read() #FIXME: closes the stream? Theoretically, in python2 no! check
+        
     if PY3: #convert to unicode, which is the default string type. Otherwise it complains that it has byte strings
         #(py2 does not complain because byte strings are the default)
         request_body = request_body.decode('utf-8')

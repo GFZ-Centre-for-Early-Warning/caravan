@@ -222,7 +222,7 @@ def query_simulation_progress(request, response):
 def query_simulation_data(request, response):
     event = request.json
     session_id = event['session_id']
-    print("session id"+str(session_id))
+    #print("session id"+str(session_id))
     conn = glb.connection(async=True)
     #query:
     #note: ::json casts as json, not as jason-formatted string

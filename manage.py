@@ -45,6 +45,10 @@ if __name__ == "__main__":
     file = "" #"caravan/static/index.html"
     port = 8080
     
+    #set debug mode to true:
+    import caravan.settings.globals as glb
+    glb._DEBUG_ = True
+    
     #first argument is the script name (manage.py), therefore we start reading from index 1
     if (len(sys.argv)<2 or not (sys.argv[1] in openbrowser or sys.argv[1] in runserver)):
         print("ERROR! call manage.py opt port (where port is optional, defaults to 8080)")

@@ -255,9 +255,6 @@ def caravan_run(input_event):
                 if twf is None: 
                     num_malformed+=1
                     targets[i] = twf
-                
-
-
         else:
             msg = "No target cells found (zero cells)"
             raise Exception(msg)        
@@ -315,7 +312,8 @@ def caravan_run(input_event):
         #See also https://github.com/tisimst/mcerp/blob/master/mcerp/__init__.py
         
         logdir = None
-        if _DEBUG_:
+        DO_WRITE_DIR = False #secondary debug flag
+        if _DEBUG_ and DO_WRITE_DIR:
             folder = os.path.join(os.path.dirname(os.path.realpath(__file__)),"../_tmp/runerrors/{:d}".format(session_id))
             if os.path.exists(folder):
                 print("EMPTYING DIR {0}".format(str(folder)))
@@ -366,10 +364,8 @@ def caravan_run(input_event):
         for t in targets:
             if t is None: continue
             intensity = gmpe_func(t[3], t[2])
-            
             #geocell_run(gmpe_func, t[3], t[2], percentiles, t[0], t[1], gm_only, scenario_id, session_id, logdir)
             P.apply_async(geocell_run, [val(intensity), t[3], t[2], percentiles, t[0], t[1], gm_only, scenario_id, session_id, logdir])
-            #P.apply_async(geocell_run, [gmpe_func, t[3], t[2], percentiles, t[0], t[1], gm_only, scenario_id, session_id, logdir],kwds={})
             
         P.close()
             

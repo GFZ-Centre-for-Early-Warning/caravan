@@ -13,6 +13,9 @@ __pycache__/
 # C extensions
 *.so
 
+#tilde extensions
+*.*~
+
 # Distribution / packaging
 .Python
 env/
