@@ -27,7 +27,7 @@ __date__ ="$Nov 13, 2014 1:08:50 PM$"
 # it does not interpolate, resample or whatever...
 mcerp_npts = 30 #10000 is the default
 #tessellation ids:
-tess_ids = (2,) #(4, 7,) #Other values (7,6,3,2,1)
+tess_ids = (1,) #(4, 7,) #Other values (7,6,3,2,1)
 #percentiles for calculation in core. 
 #They need NOT to be sorted ascending, they will inside the code
 #HOWEVER, ALL VALUES IN ]0,1[, I.E., DO NOT SET ANY VALUE TO 0 or 1:

@@ -128,7 +128,7 @@ additional_gmpes_modules = []
 
 #tessellations ids. HArd coded better maybe to check the dbase?
 tessellations = {
-    1 : "urbanstructures_voronoi",
+    1 : "regional voronoi",
     2 : "bishkek_grid_1km",
     3 : "ca_cvtess_bishkek",
     4 : "bishkek_grid_2km",
