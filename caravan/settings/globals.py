@@ -218,9 +218,12 @@ DEFAULT_APP_LANG="en"
 
 #FIXME: MOVE decimals as scenario type (e.g., scenario = ('name', decimals)) and implement a type 'n':number, 'f' float, 'b' boolean, 'i' integer, 
 #'d' date 't' time
+
+# NOTE: default coords are set to the historical Belovodsk 1885 earthquake
+
 params ={
     gk.LAT : {
-    'default': 42.87,
+    'default': 42.7,
     'parse_func': parser.parsefloat,
     'parse_opts': {'interval':[-90,90], 'decimals': 3},
     'distrib':'normal',
@@ -229,7 +232,7 @@ params ={
     },
     
     gk.LON : {
-    'default': 74.6,
+    'default': 74.0,
     'parse_func': parser.parsefloat,
     'parse_opts': {'interval':[-180,180], 'decimals': 3},
     'distrib':'normal',
@@ -272,7 +275,7 @@ params ={
     },
 
     gk.STR: {
-    'default': 0,
+    'default': 90,
     'parse_func': parser.parsefloat,
     'parse_opts': {'interval':[0,360], 'decimals': 0},
     'distrib':'uniform',
