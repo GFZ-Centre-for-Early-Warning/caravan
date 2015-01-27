@@ -641,7 +641,7 @@ div.languages a{
 #leaflet-control{
 	background-color:white;
 	padding: 5px;
-	padding-left: 10px; /*visually, it is better iof left padding increases*/
+	padding-left: 10px; /*visually, it is better if left padding increases*/
 }
 #legend-container{
 	margin-right: 10px;

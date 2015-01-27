@@ -146,6 +146,9 @@
 	}
 	
 	
+    //In order to display the map on the website the leaflet library is used
+    //for information and documentation see http://leafletjs.com/    
+        
 	//var crvn = caravan; //globally defined
     function MapManager(mapElementId /*, layerNames*/) {
         var map;
@@ -164,7 +167,7 @@
         try {
             //CREATING THE MAP. SEE http://leafletjs.com/reference.html#map-constructor
             map = leaf.map(mapElementId).setView([41.25, 74.75], 7);
-            //add baselayer
+            //add baselayer SEE http://leafletjs.com/reference.html#tilelayer
             baseLayer = leaf.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
                 maxZoom: 18,
                 attribution: 'Processing &copy; <a target="_blank" href="http://www.gfz-potsdam.de/en/research/organizational-units/technology-transfer-centres/centre-for-early-warning-systems-ews/">GFZ Potsdam - Centre for Early Warning Systems</a>' +
@@ -223,6 +226,8 @@
         
         var selLayerName = undefined;
         
+        
+        //this function manages the controlchart of the legend
         var control = (function(){
         	function Control(){
             	var _style_ = 'none';
