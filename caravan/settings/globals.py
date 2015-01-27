@@ -126,6 +126,8 @@ sof={
 #the names of additional modules to get gmpes from
 additional_gmpes_modules = []
 
+#IMPORTANT:when changing one of these parameters make sure to change the parameter
+#in index.html as well(line 510 <a class="selected"....> ) otherwise it could cause problems
 #tessellations ids. HArd coded better maybe to check the dbase?
 tessellations = {
     1 : "regional voronoi",
