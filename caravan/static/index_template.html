@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--html file which sets up the webpage-->
 <html>
     <head>
         <title></title>
@@ -27,8 +28,7 @@
         <!-- jquery: remove ".min" if you want debug inspection (loads slower) -->
         <script src="libs/flot-0.8.3/jquery.flot.min.js" type="text/javascript" ></script>
         <script src="libs/js/map.js" type="text/javascript"></script>
-		<script src="libs/js/lang_dict.js" type="text/javascript"></script>
-        <script src="libs/js/legend.js" type="text/javascript"></script>
+	<script src="libs/js/lang_dict.js" type="text/javascript"></script>
         <script type="text/javascript">
             var $ = jQuery;
             $(document).ready(function () {
@@ -391,6 +391,7 @@
         </script>
     </head>
     <body>
+        <!--This div sets up the event options of the webpage-->
         <div class="h-layout-left">
             <div class=h-wrapper>
                 <div class="v-layout banner" >
@@ -551,6 +552,10 @@
         <div class="h-layout-right">
             <div class="h-wrapper"></div>
         </div>
+         <!--MAP/LAYER IMPLEMENTATION
+            div id="map" holds the map
+            New Map/layer options should be implemented in map.js function MapManager
+         -->
         <div class="h-layout-center">
             <div class="h-wrapper">
                 <div class="skinnable-panel">
@@ -603,17 +608,16 @@
 				<span data-title="{% MSI %}"></span>
                 <table> 
                 <tr>
-                	<td data-value=4 style="background-color:#FFFF11"></td> <!-- hidden, used for map -->
+                    <td data-value=4 style="background-color:#FFFF11"></td> 
                     <td data-value=5 style="background-color:#FFD700"></td>
                     <td data-value=6 style="background-color:#FFAA00"></td>
                     <td data-value=7 style="background-color:#FF5500"></td>
                     <td data-value=8 style="background-color:#FF0000"></td>
                     <td data-value=9 style="background-color:#D00000"></td>
                     <td data-value=10 style="background-color:#A00000"></td>
-                    <td data-value=11 style="background-color:#900000"></td> <!-- hidden, used for map -->
-                    <td></td>
+                    <td data-value=11 style="background-color:#900000"></td> 
                 </tr>  
-                <tr> <!-- see text decoration overline underline -->
+                <tr> 
                     <td class=legend-label data-label="&le;IV">&le;IV</td>
                     <td class=legend-label data-label="V">V</td>
                     <td class=legend-label data-label="VI">VI</td>
