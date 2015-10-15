@@ -16,18 +16,14 @@ from __future__ import print_function
 __author__="Riccardo Zaccarelli, PhD <riccardo(at)gfz-potsdam.de, riccardo.zaccarelli(at)gmail.com>"
 __date__ ="$Jun 23, 2014 1:15:27 PM$"
 
-import json
-import traceback
+import json, traceback, time, os, sys, re
 from cgi import parse_qs, escape #for parsing get method in main page (address bar)
 
-import time
 import caravan.settings.globals as glb
 CARAVAN_DEBUG = glb._DEBUG_; #debug variable, as of Juli 2014 it controls whether exceptions in ResponseHandler should throw the traceback or simply an error message
 
 
-import os
-import miniwsgi
-import sys
+import miniwsgi, quakelink
 
 #todo: check parser dim
 #todo: impolement html module to be clear where to write in the html page?
@@ -35,10 +31,12 @@ import sys
 
 from caravan.core.core import caravan_run as run
 from caravan.core.runutils import RunInfo
+from caravan.core.event import Reader as Event
+
 import mcerp
 import caravan.settings.globalkeys as gk
 import caravan.fdsnws_events as fe
-import json, re
+
 CaravanApp = miniwsgi.App()
 
 #@CaravanApp.route(url='caravan/static/index.html', headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html', 
@@ -145,7 +143,144 @@ def fdsn_query(request, response):
 #         if p == 'catalog':
 #             s= cat[p].value + s
 #         else
-    return v        
+    return v
+
+
+
+@CaravanApp.route(url='quakelink_query.html', headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html',
+def quakelink_query(request, response):
+    #when this is not a post request, print anyway the table. Therefore:
+    try:
+
+        cols = ("EventLocationName","Time","Latitude","Longitude", "Depth", "Magnitude", "EventId")
+        submittable_keys = {"Latitude": gk.LAT,"Longitude": gk.LON, "Depth": gk.DEP, "Magnitude": gk.MAG, "EventId": gk.EID} #numeric are also submittable
+
+        value = ""
+
+        def esc(s, quote=True): return miniwsgi.escape(s, quote)
+
+        conn = glb.connection(async=True)
+
+        try:
+            rows = conn.fetchall("""SELECT name,processing.sessions.gid FORM FROM processing.scenarios as SC
+            LEFT JOIN
+            processing.sessions ON (processing.sessions.scenario_id = SC.gid)
+        WHERE
+        TRIM(SC.name) <> ''""",())
+        except Exception, e:
+            print(e)
+
+        conn.close()
+
+
+        vals = StringIO()
+        vals.write(request.urlbody)
+        vals.write("<table class='quakelink'><thead class='title'><tr>\n")
+        vals.write(''.join("<td data-sort='{0}'>{1}</td>".format('num' if v in submittable_keys else 'str', esc(v)) for v in cols))
+        vals.write('\n</tr>\n</thead>')
+        vals.write("<tbody>")
+
+        write_inner_quakelink_table(vals, rows, submittable_keys, cols)
+
+        vals.write("</tbody></table>")
+        value = vals.getvalue()
+        vals.close()
+
+    except Exception as e:
+        value = "<span class=error>"+esc(str(e))+"</span>"
+        if CARAVAN_DEBUG:
+            traceback.print_exc()
+
+    s = StringIO()
+    s.write(value)
+    s.write("\n</body>\n</html>")
+    v = s.getvalue()
+    s.close()
+
+    return v
+
+
+@CaravanApp.route(headers={'Content-Type':'application/json'})
+def query_quakelink_data(request, response):
+    jsonData = request.json
+    #when this is not a post request, print anyway the table. Therefore:
+    try:
+
+        cols = ("EventLocationName","Time","Latitude","Longitude", "Depth", "Magnitude", "EventId")
+        submittable_keys = {"Latitude": gk.LAT,"Longitude": gk.LON, "Depth": gk.DEP, "Magnitude": gk.MAG, "EventId": gk.EID} #numeric are also submittable
+
+        value = ""
+
+        def esc(s, quote=True): return miniwsgi.escape(s, quote)
+
+        conn = glb.connection(async=True)
+
+        try:
+            rows = conn.fetchall("""SELECT name,processing.sessions.gid FORM FROM processing.scenarios as SC
+            LEFT JOIN
+            processing.sessions ON (processing.sessions.scenario_id = SC.gid)
+        WHERE
+        TRIM(SC.name) <> '' AND processing.sessions.gid > %s""",(jsonData['session_id'],))
+        except Exception, e:
+            print(e)
+            traceback.print_exc()
+
+        conn.close()
+
+
+        vals = StringIO()
+        write_inner_quakelink_table(vals, rows, submittable_keys, cols)
+        value = vals.getvalue()
+        vals.close()
+
+        return response.tojson({'new_events': value})
+    except Exception as e:
+        value = "<span class=error>"+esc(str(e))+"</span>"
+        if CARAVAN_DEBUG:
+            traceback.print_exc()
+
+
+def write_inner_quakelink_table(vals, rows, submittable_keys, cols):
+    def esc(s, quote=True): return miniwsgi.escape(s, quote)
+
+    for r in rows:
+        vals.write('<tr>')
+
+        name = r[0]
+        session_id = r[1]
+        if not name or not session_id:
+            continue
+
+        session_id = str(session_id)
+        cont = quakelink.quakelink(glb.quakelink_conf['url'], params = {'id': name})
+        v = Event().createContext(cont["content"])
+
+        unc = {} if not 'Uncertainty' in v else v['Uncertainty']
+        for k in cols:
+            tdval = v[k]
+            tdstr = str(tdval) if k!="Time" else str(tdval).replace("T"," ").replace("Z","")
+            tdsubmit_value = tdstr
+            tdsubmit_key = None
+            if k in submittable_keys:
+                tdsubmit_key = submittable_keys[k]
+                if k in unc:
+                    tdstr+=" &plusmn; " + str(unc[k])
+                    pr = glb.params[tdsubmit_key]
+                    if 'distrib' in pr:
+                        dstr = pr['distrib'].lower()
+                        tdsubmit_value = str(tdval) + " " + str(unc[k]/2) if dstr == 'normal' else str(tdval - unc[k]) + " " + str(tdval + unc[k])
+
+            vals.write('<td')
+            vals.write(' data-value="{}"'.format(esc(tdstr)))
+            if tdsubmit_key: vals.write(' data-submit-key="{}" data-submit-value="{}"'.format(esc(tdsubmit_key), esc(tdsubmit_value)))
+            vals.write('>{}</td>'.format(tdstr))
+
+        #write session
+        vals.write('<td display="none"')
+        vals.write(' data-value="{}"'.format(esc(session_id)))
+        vals.write(' data-submit-key="{}" data-submit-value="{}"'.format(esc('session_id'), esc(session_id)))
+        vals.write('></td>')
+        vals.write('</tr>')
 
 #self._default_headers['Content-type']= 'application/json'
 #FIXME: CHECK INLINE IMPORT PERFORMANCES!!!
@@ -378,7 +513,10 @@ def create_main_page(): #FIXME: check compatibility with io in python3
     import re
     
     r = re.compile("\{\%\\s*(.*?)\\s*\%\}",re.DOTALL)
-    
+
+    # read tesselation from database and set it to the globalkeys
+    glb.params[gk.TES].update(get_tesselations())
+
     lastidx = 0
     for m in r.finditer(k,lastidx):
         if m.start() > lastidx:
@@ -495,6 +633,28 @@ def create_dict_js(): #FIXME: check compatibility with io in python3
     fout.close()
     set_mtime(dest, check_sources)
 
+
+def get_tesselations():
+    conn = glb.connection(async=True)
+
+    try:
+        rows = conn.fetchall("""SELECT gid, name FROM exposure.tessellations""",())
+    except Exception, e:
+        print(e)
+
+    conn.close()
+
+    tess_ids = []
+    tessellations = {}
+    for row in rows:
+        tess_ids.append(row[0])
+        tessellations[row[0]] = row[1]
+
+    return {
+    'default': tess_ids,
+    'parse_opts' : {'dim':[1, len(tessellations)], 'interval':[1, len(tessellations)]},
+    'html': lambda: " ".join(["<a {0} data-value={1:d} data-doc=\"{2}\">{3}</a>".format("class=\"selected\"" if i in tess_ids else "",i, gk.TES, v) for i,v in tessellations.iteritems()])
+    }
 
 #execute files:
 #but only if in debug mode

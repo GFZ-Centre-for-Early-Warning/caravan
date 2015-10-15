@@ -100,6 +100,19 @@ def imgpath():
 def connection(host=opts.DB_HOST, port=opts.DB_PORT, dbname=opts.DB_NAME, user=opts.DB_USER,  password=opts.DB_PSWD, async=opts.DB_ASYNC):
     return dbutils.Connection(host, port, dbname, user, password, async)
 
+#quakelink
+
+quakelink_conf = {
+    'url'    : "http://quakelink.gempa.de:18080/events/query",
+	'min_mag': 5.0,
+	'max_mag': 7.9,
+	'min_lat': None,
+	'max_lat': None,
+	'min_lon': None,
+	'max_lon': None,
+	'updated': "2015,08,27,07,45,28,841348"
+}
+
 #gmpes:
 #Note that the value will affect also the param ipe interval (see below)
 #Ideally, we could just query the database, so that database changes need NOt to be synchronized also here
@@ -267,6 +280,13 @@ params ={
     'scenario_name':'gmpe_id',
     'html': lambda: " ".join("<a data-value={0:d} data-sourcetype={1:d} data-doc=\"{2}\" >{2}</a>" \
       .format(idx, g.sourcetype if g.sourcetype or g.sourcetype==0 else "", g.__name__) for idx, g in def_gmpes.iteritems())
+    },
+
+    gk.EID : {
+    'default': '',
+    'parse_func': parser.parsestr,
+    'scenario_name':'name',
+    #'dim': lambda d: [-1,3]
     },
 
     gk.TIM : {
