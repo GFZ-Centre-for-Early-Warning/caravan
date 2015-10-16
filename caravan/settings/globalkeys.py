@@ -15,6 +15,7 @@ TIM = "tim" #time
 STR = "str" #strike
 SOF = "sof" #style of faulting
 DIP = "dip" #dip
+EID = "eid" #eid
 #ground motion only:
 GMO = "gm_only" 
 #distribution (mcerp.npts) points:
