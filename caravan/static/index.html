@@ -6,12 +6,13 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
         <link rel="stylesheet" type="text/css" href="css/layout.css"/>
+        <link rel="stylesheet" type="text/css" href="css/quakelink.css"/>
         <link rel="stylesheet" type="text/css" href="css/skin.css"/>
 	
 		<script type="text/javascript">
 			var caravan = {
 				imgPath : function(imageName){return "imgs/"+imageName;},
-				params: {"GMO": "gm_only", "STR": "str", "SOF": "sof", "DEP": "dep", "IPE": "ipe", "ECL": "econ_loss", "LON": "lon", "FAT": "fatal", "AIR": "aoi_i_ref", "TIM": "tim", "AOI": "aoi", "MSI": "intens", "LAT": "lat", "TES": "tess_ids", "DIP": "dip", "MAG": "mag", "AKS": "aoi_km_step", "DNP": "mcerp_npts"}
+				params: {"TES": "tess_ids", "GMO": "gm_only", "STR": "str", "SOF": "sof", "DEP": "dep", "IPE": "ipe", "ECL": "econ_loss", "LON": "lon", "FAT": "fatal", "AIR": "aoi_i_ref", "TIM": "tim", "EID": "eid", "MSI": "intens", "LAT": "lat", "AOI": "aoi", "DIP": "dip", "MAG": "mag", "AKS": "aoi_km_step", "DNP": "mcerp_npts"}
 			}; //define global variable. Everything in here
 		</script>
         
@@ -192,8 +193,57 @@
                     
         			return false; //for anchors
                 });
-                
-                
+
+                // quakelink
+                $('#query_events_quakelink_btn').click(function(){
+                    if ($('#_qe_quakelink_container').css('display') == 'none') {
+                        $('#_qe_quakelink_container').popSlideToggle({invoker:$(this), duration:'fast', toolTip:true, complete:function(){
+                                   var iframe = $('#quakelink_frame');
+                                   var wdw = iframe.get(0).contentWindow;
+                                   if(wdw && wdw.update2){
+                                       wdw.update2(); //update the inner table
+                                   }
+                               }
+                           });
+                   } else {
+                       $('#_qe_quakelink_container').popClose();
+                   }
+                    return false; //for anchors
+                });
+
+                //small delay when clicking the query event button to show wait div:
+                $('#query_events_quakelink_button').click(function(){
+                    $('#waiting_div').showOver($('#_qe_quakelink_right').find('div.v-wrapper'));
+                    var DELAY = 200;
+                    setTimeout(function(){
+                        $('#query_events_form').submit();
+                    },DELAY);
+                });
+
+                //hide waiting when iframe has loaded
+                $('#quakelink_frame').load(function() {
+                	$('#waiting_div').hide();
+                });
+
+                $('#choose_quakelink_event').click(function(){
+					var iframe = $('#quakelink_frame');
+					var wdw = iframe.get(0).contentWindow;
+					var data = wdw.getSelectedItem();
+                    console.log(data);
+					for(var k in data){
+						$('#'+k).val(data[k]);
+					}
+					$('#_qe_quakelink_container').popClose();
+
+                    //force repositioning of the epicenter
+                    //(should work, the text fields don't raise any event though)
+                    map.update(data['session_id']);
+                    caravan.map.centerEpicenter();
+
+        			return false; //for anchors
+                });
+
+
                 //help button:
                 $('#show_info').click(function(){
                 	$(this).toggleClass('selected');	
@@ -403,6 +453,9 @@
                             <a data-doc="show_info" id="show_info" href=# class="check" >
                                	<img src="imgs/info.png" data-title="show_info"/>
                             </a>
+                            <a data-doc="query_events_from_quakelink" id="query_events_quakelink_btn" href=# class="btn query-events-button" >
+                               	<img src="imgs/quakelink.ico" data-title="query_events_from_quakelink"/>
+                            </a>
                             <a data-doc="query_events_from_catalog" id="query_events_btn" href=# class="btn query-events-button" >
                                	<img src="imgs/catalog.png" data-title="query_events_from_catalog"/>
                             </a>
@@ -507,7 +560,7 @@
                                         <div data-advanced=true id=tess_ids class="list">
                                             <!--Along the lines of Django template, the variable below will be substituted by the ipes on the server-->
                                             <!--DO NOT MODIY THE LINE BELOW!!!!!!-->
-                                            <a class="selected" data-value=1 data-doc="tess_ids">regional voronoi</a> <a  data-value=2 data-doc="tess_ids">bishkek_grid_1km</a> <a  data-value=3 data-doc="tess_ids">ca_cvtess_bishkek</a> <a  data-value=4 data-doc="tess_ids">bishkek_grid_2km</a> <a  data-value=5 data-doc="tess_ids">grid_kemin_5000</a> <a  data-value=6 data-doc="tess_ids">belovodsk_grid_2000</a> <a  data-value=7 data-doc="tess_ids">cvt_regional</a>
+                                            <a class="selected" data-value=1 data-doc="tess_ids">geocells_regional_cvt</a> <a class="selected" data-value=2 data-doc="tess_ids">india_dist</a>
                                             <!--                                            <option value="0" selected="selected">EMCA</option>
                                                                                         <option value="1">Global</option>-->
                                         </div>
@@ -548,14 +601,13 @@
                     </div>
                 </div>   
             </div>
-        </div>        
+        </div>
         <div class="h-layout-right">
             <div class="h-wrapper"></div>
         </div>
          <!--MAP/LAYER IMPLEMENTATION
-            div id="map" creates the map of the webpage
-            New Map/layer options should be implemented in map.js 
-            function MapManager using the leaflet library
+            div id="map" holds the map
+            New Map/layer options should be implemented in map.js function MapManager
          -->
         <div class="h-layout-center">
             <div class="h-wrapper">
@@ -758,6 +810,51 @@
 				</div>
 			</div>
 		</div>
-    
+
+
+		<!--  quakelink query div, appended to the body -->
+		<div id="_qe_quakelink_container" class="skinnable-panel raised v-layout v-no-bottom" style='display:none'>
+			<div class="v-wrapper">
+				<div class="v-layout-top">
+					<div class="title">Query preprocessed event from Quakelink
+					<!-- this was the close button. Hide it cause otherwise the fdsn event query dialog seems a window,
+                        and in fact it has a popup behavior (e.g., hide it on focus lost). If you want to uncomment it,
+                         you need to implement also the hide action (the anchor below is not attached to any event)
+                        <a id="_qe_close_btn" style="float:right" href="#"><img title="close" src="imgs/close.png"></a>
+					-->
+                    </div>
+				</div>
+                <div class="v-layout-center">
+                    <div id="_qe_left" class="h-layout-left">
+                        <div class="h-wrapper">
+                            <div class="v-layout v-no-top">
+                                <div class="v-wrapper">
+
+                                    <div id="_qe_left_bottom" class="v-layout-bottom">
+                                        <!--  the type attribute prevents the button from submitting the form -->
+                                    </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="_qe_right" class="h-layout-center">
+                        <div class="h-wrapper">
+                            <div class="v-layout v-no-top">
+                                <div class="v-wrapper">
+                                    <div id="_qe_result_table" class="v-layout-center">
+                                        <iframe src='quakelink_query.html'id='quakelink_frame' name='quakelink_frame' class='quakelink_frame'></iframe>
+                                    </div>
+                                    <div id="_qe_right_bottom" class="v-layout-bottom">
+                                        <span id="_qe_right_bottom_info"></span><button id=choose_quakelink_event data-title=choose_selected_event data-doc=choose_selected_event class="myButton"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			</div>
+		</div>
+
     </body>
 </html>
