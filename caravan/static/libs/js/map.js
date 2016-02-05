@@ -168,12 +168,12 @@
             //CREATING THE MAP. SEE http://leafletjs.com/reference.html#map-constructor
             map = leaf.map(mapElementId).setView([41.25, 74.75], 7);
             //add baselayer SEE http://leafletjs.com/reference.html#tilelayer
-            baseLayer = leaf.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+            baseLayer = leaf.tileLayer('https://{s}.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWF4cGl0dG9yZSIsImEiOiJlZGU3NTk0NzFlY2UyOGI2MTI5N2YwOWVlOTE0MTgyMiJ9.X5fepwoCb37pkwO9pUlBkA', {
                 maxZoom: 18,
                 attribution: 'Processing &copy; <a target="_blank" href="http://www.gfz-potsdam.de/en/research/organizational-units/technology-transfer-centres/centre-for-early-warning-systems-ews/">GFZ Potsdam - Centre for Early Warning Systems</a>' +
                         ' | Map data &copy; <a target="_blank" href="http://openstreetmap.org">OpenStreetMap</a>, ' +
                         ' | Imagery &copy; <a target="_blank" href="http://mapbox.com">Mapbox</a> | <span id=latlon>&nbsp;</span>',
-                id: 'examples.map-i875mjb7'
+                id: 'mapbox.outdoors'
             }).addTo(map);
         } catch (e) {
             //console.log(e);
