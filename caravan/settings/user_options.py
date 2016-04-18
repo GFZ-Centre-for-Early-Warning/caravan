@@ -43,7 +43,7 @@ gm_only = False
 #database default settings:
 DB_ASYNC = 1
 DB_HOST = 'localhost' #if "makalu" == socket.gethostname() else "makalu.gfz-potsdam.de" #'lhotse21.gfz-potsdam.de' #'localhost'
-DB_NAME = 'caravan'
+DB_NAME = 'caravan_dev'
 DB_USER = 'postgres'
 DB_PSWD = 'postgres'
 DB_PORT = 5432

@@ -332,7 +332,7 @@
                     var data = featureData.data;
                     var val = featureData.value;
                     if(data===null || data===undefined || val === null || val === undefined){
-                        return;
+                   //     return; //fixme: added to test
                     }
                     
                     e.layer.setStyle({
@@ -560,7 +560,7 @@
                                         <div data-advanced=true id=tess_ids class="list">
                                             <!--Along the lines of Django template, the variable below will be substituted by the ipes on the server-->
                                             <!--DO NOT MODIY THE LINE BELOW!!!!!!-->
-                                            <a class="selected" data-value=1 data-doc="tess_ids">geocells_regional_cvt</a> <a class="selected" data-value=2 data-doc="tess_ids">india_dist</a>
+                                            <a class="selected" data-value=1 data-doc="tess_ids">kg_2016_04</a>
                                             <!--                                            <option value="0" selected="selected">EMCA</option>
                                                                                         <option value="1">Global</option>-->
                                         </div>

@@ -16,7 +16,7 @@ version. For more information, see http://www.gnu.org/
 __author__="Riccardo Zaccarelli, PhD (<riccardo(at)gfz-potsdam.de>, <riccardo.zaccarelli(at)gmail.com>)" 
 __date__ ="$Oct 28, 2014 12:46:44 PM$"
 
-_DEBUG_=False #SET TO TRUE IF DEVELOPMENT VERSION, TO FALSE OTHERWISE!!!
+_DEBUG_=True #SET TO TRUE IF DEVELOPMENT VERSION, TO FALSE OTHERWISE!!!
 
 import sys
 _PY3 = True if sys.version_info.major == 3 else False
@@ -143,13 +143,7 @@ additional_gmpes_modules = []
 #in index.html as well(line 510 <a class="selected"....> ) otherwise it could cause problems
 #tessellations ids. HArd coded better maybe to check the dbase?
 tessellations = {
-    1 : "regional voronoi",
-    2 : "bishkek_grid_1km",
-    3 : "ca_cvtess_bishkek",
-    4 : "bishkek_grid_2km",
-    5 : "grid_kemin_5000",
-    6 : "belovodsk_grid_2000",
-    7 : "cvt_regional"
+    5 : "kg_cvt_10k_2016_04",
 }
 #scenario columns associated to the relative index (indices are used in Scenario to calculate the hash of a scenario query)
 #We leave also the dbase value type commented, who knows if it is of help for some future release
@@ -334,7 +328,7 @@ params ={
     gk.TES: {
     'default': tess_ids,
     'parse_func': parser.parseint,
-    'parse_opts' : {'dim':[1, len(tessellations)], 'interval':[1, len(tessellations)]},
+    'parse_opts' : {'dim':[1, len(tessellations)], 'interval':[1,100]},#FIXME: tessellation IDs must be in the 1-100 interval
     'html': lambda: " ".join(["<a {0} data-value={1:d} data-doc=\"{2}\">{3}</a>".format("class=\"selected\"" if i in tess_ids else "",i, gk.TES, v) for i,v in tessellations.iteritems()])
     },
 

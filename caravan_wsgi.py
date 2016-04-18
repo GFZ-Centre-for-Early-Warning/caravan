@@ -352,6 +352,16 @@ def query_simulation_progress(request, response):
         
     return response.tojson(ret)
 
+@CaravanApp.route(headers={'Content-Type':'application/json'})
+def query_simulation_summary(request, response):
+    event = request.json
+    session_id = event['session_id']
+    conn = glb.connection(async=True)
+    data = conn.fetchall("""select sum(est_fatalities[1]),sum(est_fatalities[2]) from risk.social_conseq where session_id=%s; """,(session_id,))
+    conn.close()
+    
+    return response.tojson(dataret)
+
 
 @CaravanApp.route(headers={'Content-Type':'application/json'})
 def query_simulation_data(request, response):
@@ -376,6 +386,7 @@ LEFT JOIN
 exposure.geocells as G ON (G.gid = GM.geocell_id)
 WHERE 
 GM.session_id=%s""",(session_id,)) 
+    #fixme: (MAX) there is no condition on tess_id ! Since the query uses geometry, a condition should be added.
 
     #conn.conn.commit()
     conn.close()

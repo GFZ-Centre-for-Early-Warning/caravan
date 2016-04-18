@@ -1,5 +1,6 @@
 import mcerp
 import scipy.stats
+import numpy as np
 import caravan.settings.globals as glb
 
 class loss:
@@ -134,10 +135,12 @@ class loss:
 
         fat_labels = self._fatalities_labels
         dist = self.__fat
+        est_fat_perc = np.percentile(self.__fat._mcpts,[5,95]).astype(int) #5th and 95th percentiles
+        est_fat = [v for v in est_fat_perc]
         fatalities_prob_dist =[v for v in glb.discretepdf(dist, fat_labels)]
         
-        exc ='INSERT INTO risk.social_conseq (session_id, scenario_id, geocell_id, target_id, fatalities_prob_dist) VALUES (%s, %s, %s, %s, %s)'
-        values = (self.__session_id, self.__scenario_id, self.__geocell_id, self.__target_id, fatalities_prob_dist)
+        exc ='INSERT INTO risk.social_conseq (session_id, scenario_id, geocell_id, target_id, est_fatalities, fatalities_prob_dist) VALUES (%s, %s, %s, %s, %s, %s)'
+        values = (self.__session_id, self.__scenario_id, self.__geocell_id, self.__target_id, est_fat, fatalities_prob_dist)
         db_conn.execute(exc, values)
 
         
