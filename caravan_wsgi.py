@@ -434,19 +434,21 @@ GM.session_id=%s""",(session_id,))
                 m = data.pop() #removes and returns the last index
                 return data, m
             elif name == gk.FAT: #return INDEX OF max value
-                remVal = 1
-                max = 0
-                ind_of_max = 0
-                i = 0
-                for n in data:
-                    if n > max: 
-                        max = n
-                        ind_of_max = i
-                    remVal -= n
-                    if remVal < max: break #< not <=: priority to higher value, if two or more are equal
-                    i += 1
+                fn = data.pop() #pop last element, which is the median according to loss.py
+                return data,fn
+                #remVal = 1
+                #max = 0
+                #ind_of_max = 0
+                #i = 0
+                #for n in data:
+                #    if n > max: 
+                #        max = n
+                #        ind_of_max = i
+                #    remVal -= n
+                #    if remVal < max: break #< not <=: priority to higher value, if two or more are equal
+                #    i += 1
 
-                return data, ind_of_max
+                #return data, ind_of_max
             elif name == gk.ECL: #economic losses, to be implemented
                 pass
         except: pass #exception: return None, None below

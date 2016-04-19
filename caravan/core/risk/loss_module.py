@@ -6,8 +6,8 @@ import caravan.settings.globals as glb
 class loss:
     _type_int = type(0)
     _type_float = type(5.0)
-    _fatalities_labels = (1, 10, 100, 1000, 10000, 100000)
-     
+    #_fatalities_labels = (1, 10, 100, 1000, 10000, 100000)
+    _fatalities_labels = (1, 10, 20, 50, 100, 200,500,1000) 
     '''
     Class keeping loss estimation methods
     '''
@@ -93,7 +93,7 @@ class loss:
                     occupancy_storey_high = self.__bt_prop[j][3]
                     
 #                    occupancy_storey = occupancy_storey_low if occupancy_storey_low >= occupancy_storey_high else \
-                    occupancy_storey =                    mcerp.Uniform(occupancy_storey_low, occupancy_storey_high)
+                    occupancy_storey = mcerp.Uniform(occupancy_storey_low, occupancy_storey_high)
                     
 #                    lower = occupancy_storey_low * self.__bt_nr[i][1]
 #                    upper = occupancy_storey_high * self.__bt_nr[i][1]
@@ -138,7 +138,8 @@ class loss:
         est_fat_perc = np.percentile(self.__fat._mcpts,[5,95]).astype(int) #5th and 95th percentiles
         est_fat = [v for v in est_fat_perc]
         fatalities_prob_dist =[v for v in glb.discretepdf(dist, fat_labels)]
-        
+	fatalities_prob_dist.append(dist.percentile(0.5) if isinstance(dist, mcerp.UncertainFunction) else dist)
+        #fatalities_prob_dist.append(np.percentile(self.__fat._mcpts,0.5).astype(int))
         exc ='INSERT INTO risk.social_conseq (session_id, scenario_id, geocell_id, target_id, est_fatalities, fatalities_prob_dist) VALUES (%s, %s, %s, %s, %s, %s)'
         values = (self.__session_id, self.__scenario_id, self.__geocell_id, self.__target_id, est_fat, fatalities_prob_dist)
         db_conn.execute(exc, values)
