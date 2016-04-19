@@ -313,15 +313,18 @@
                 //implementing a global function which returns a value from a 
                 //feature set of data, as returned by the server. NOTE: we could 
                 //implement it more nicely
+                //IMPORTANT: see map.js approx. line 316. Quick doc:
+                // addLayer = function(name, $divLegend, interpolate, styleFcn)
                 
                 map.addLayer('{% MSI %}', $('#intensLegend'), true,
                     function(feature, val, colorMap, defOpts){
                         defOpts.fillColor = colorMap.color(val);
                     }
                 );
-                map.addLayer('{% FAT %}', $('#fatalLegend'), false,
+                map.addLayer('{% FAT %}', $('#fatalLegend'), true,
                     function(feature, val, colorMap, defOpts){
-                        defOpts.fillColor = colorMap.color(colorMap.values()[val]);
+                        defOpts.fillColor = colorMap.color(val); 
+                        //if val if the index of max, use e.g.: colorMap.color(colorMap.values()[val]);
                     }
                 );
                 map.addLayer('{% ECL %}', $('#econLegend'), false, null);
