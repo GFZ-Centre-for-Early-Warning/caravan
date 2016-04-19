@@ -32,6 +32,7 @@ import miniwsgi, quakelink
 from caravan.core.core import caravan_run as run
 from caravan.core.runutils import RunInfo
 from caravan.core.event import Reader as Event
+from caravan.dbutils import Error as dbError
 
 import mcerp
 import caravan.settings.globalkeys as gk
@@ -340,6 +341,20 @@ def query_simulation_progress(request, response):
         if runinfo.errormsg: #status == 3:
             ret['error'] = runinfo.errormsg
 
+        if done==100.0:
+            session_id = event['session_id']
+            fat_msg = ""
+            try:
+                conn = glb.connection(async=True)
+                data = conn.fetchall("""select sum(est_fatalities[1]),sum(est_fatalities[2]) from risk.social_conseq where session_id=%s; """,(session_id,))
+                conn.close()
+                min_fat=data[0][0]
+                max_fat=data[0][1]
+                if max_fat>0:
+			        fat_msg="<b>ALERT FATALITIES EXPECTED:</b> MIN=%d MAX=%d" % (min_fat, max_fat)
+            except (TypeError,IndexError,dbError):
+                fat_msg="WARNING: unable to query DB for fatalities"
+            ret['msg'].append(fat_msg)
     else:
         ret = {"error":"query progress error: session id {0} not found".format(str(event['session_id']))}
 #     except:
@@ -351,16 +366,6 @@ def query_simulation_progress(request, response):
 #         ret = {"error":s.getvalue()}
         
     return response.tojson(ret)
-
-@CaravanApp.route(headers={'Content-Type':'application/json'})
-def query_simulation_summary(request, response):
-    event = request.json
-    session_id = event['session_id']
-    conn = glb.connection(async=True)
-    data = conn.fetchall("""select sum(est_fatalities[1]),sum(est_fatalities[2]) from risk.social_conseq where session_id=%s; """,(session_id,))
-    conn.close()
-    
-    return response.tojson(dataret)
 
 
 @CaravanApp.route(headers={'Content-Type':'application/json'})

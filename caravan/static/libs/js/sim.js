@@ -185,7 +185,7 @@
 	                //then call _stop, which re-arranges the text area and calls setStatus which notifies the 
 	                //listeners. This way, if the listeners want to have access to scenario_id and session_id, they can
 	                _stop();
-	                fireMsg("Fetching Map Data, PLEASE WAIT...");
+	                fireMsg("Fetching Map Data ...");
 	            }
 
 	            setTimeout(function () {

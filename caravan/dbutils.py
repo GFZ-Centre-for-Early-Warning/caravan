@@ -21,7 +21,8 @@ from __future__ import print_function
 __author__="Riccardo Zaccarelli, PhD (<riccardo(at)gfz-potsdam.de>, <riccardo.zaccarelli(at)gmail.com>)" 
 __date__ ="$Oct 5, 2014 8:00:00 PM$"
 
-import psycopg2 
+import psycopg2
+from psycopg2 import Error 
 import select
 import socket #used to retreive if we are runnign on makalu, see below
 # via socket.gethostname()
