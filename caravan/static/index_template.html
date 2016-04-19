@@ -374,9 +374,6 @@
                     var geocell = 'Geocell Id:'; //FIXME: move to dict!!!
                     
                     var val = featureData.value;
-                    if(name === '{% FAT %}'){
-                        val = colorMap.values()[val]; //val is the index of max in this case
-                    }
                     
                     //setup plot title:
                     var $title = $('<div>').addClass('flot-title').html(geocell+feature.id+' '+ crv.dict.title(name)+': '+val).
@@ -640,20 +637,24 @@
                        <td data-value=0 style="background-color: #008000"></td> <!--Green -->
                        <td data-value=1 style="background-color: #FFD700"></td> <!-- gold -->
                        <td data-value=10 style="background-color: #FF4500"></td> <!-- orangeRed -->
-                       <td data-value=100 style="background-color: #FF0000"></td> <!-- Red -->
-                       <td data-value=1000 style="background-color: #E00000"></td> <!-- Red darker-->
-                       <td data-value=10000 style="background-color: #CC0000"></td> <!-- Red darker darker -->
-                       <td data-value=100000 style="background-color: #CC0000"></td> <!-- Red darker darker -->
+                       <td data-value=20 style="background-color: #FF0000"></td> <!-- Red -->
+                       <td data-value=50 style="background-color: #E00000"></td> <!-- Red darker-->
+                       <td data-value=100 style="background-color: #CC0000"></td> <!-- Red darker darker -->
+                       <td data-value=200 style="background-color: #CC0000"></td> <!-- Red darker darker -->
+                       <td data-value=500 style="background-color: #CC0000"></td> <!-- Red darker darker -->
+                       <td data-value=1000 style="background-color: #CC0000"></td> <!-- Red darker darker -->
                    </tr>                                                                                    
                    <tr>     
                        <!-- <sup></sup> below, when empty, it's needed for vertical align-->
                        <td class=legend-label data-label="0<sup></sup>">0<sup></sup></td>
                        <td class=legend-label data-label="1<sup></sup>">1<sup></sup></td>
                        <td class=legend-label data-label="10<sup></sup>">10<sup></sup></td>
+                       <td class=legend-label data-label="20<sup></sup>">20<sup></sup></td>
+                       <td class=legend-label data-label="50<sup></sup>">50<sup></sup></td>
                        <td class=legend-label data-label="100<sup></sup>">100<sup></sup></td>
-                       <td class=legend-label data-label="1000<sup></sup>">1000<sup></sup></td>
-                       <td class=legend-label data-label="10<sup>4</sup>">10<sup>4</sup></td>
-                       <td class=legend-label data-label="10<sup>5</sup>">10<sup>5</sup></td>
+                       <td class=legend-label data-label="200<sup></sup>">200<sup></sup></td>
+                       <td class=legend-label data-label="500<sup></sup>">500<sup></sup></td>
+                       <td class=legend-label data-label="10<sup>3</sup>">10<sup>3</sup></td>
                    </tr>
                </table>
            </div>

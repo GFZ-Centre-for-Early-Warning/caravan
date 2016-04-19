@@ -122,3 +122,6 @@ Browse the internet for installing missing packages, if any. the /var/log/apache
 Final note (just as reminder): no caravan under /home? or want to clone somewhere else? then remember to use https for lhotse21:
     git clone https://github.com/GFZ-Centre-for-Early-Warning/caravan
 will create the caravan folder in current dir
+
+-------------------------------------------------
+Final note: copy user_options.example.py into user_options!
