@@ -28,6 +28,9 @@ sudo apt-get install python-numpy python-scipy python-matplotlib
 --------------------------------------
 WEB APP APACHE INSTALLATION
 --------------------------------------
+NOTE: to check the version of linux installed, type: lsb_release -a
+
+0) install apache2 if not previously done: sudo apt-get install apache2
 
 1) Edit, IF NEEDED, caravan.wsgi file:
 see https://code.google.com/p/modwsgi/wiki/QuickConfigurationGuide
@@ -118,6 +121,8 @@ sudo apt-get install libxml2-dev libxslt-dev python-dev
 sudo pip install lxml
 Browse the internet for installing missing packages, if any. the /var/log/apache2/error.log file should warn for it (see above)
 
+NOTE: in case of an error similar to: "/usr/bin/ld: cannot find -lz" install the package lz by typing: sudo apt-get install libz-dev and reinstall lxml
+ 
 
 Final note (just as reminder): no caravan under /home? or want to clone somewhere else? then remember to use https for lhotse21:
     git clone https://github.com/GFZ-Centre-for-Early-Warning/caravan
