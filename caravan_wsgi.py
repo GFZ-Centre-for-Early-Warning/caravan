@@ -435,7 +435,7 @@ GM.session_id=%s""",(session_id,))
                 return data, m
             elif name == gk.FAT: #return INDEX OF max value
                 fn = data.pop() #pop last element, which is the median according to loss.py
-                return data,fn
+                return data, fn
                 #remVal = 1
                 #max = 0
                 #ind_of_max = 0

@@ -6,7 +6,7 @@ caravan/_tmp/
 caravan/static/index.html
 caravan/static/libs/js/lang_dict.js
 caravan/settings/user_options.py
-caravan/caravan_db/
+caravan_db/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

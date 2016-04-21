@@ -135,7 +135,7 @@ class loss:
 
         fat_labels = self._fatalities_labels
         dist = self.__fat
-        est_fat_perc = np.percentile(self.__fat._mcpts,[5,95]).astype(int) #5th and 95th percentiles
+        est_fat_perc = dist.percentile([0.05,0.95]) #5th and 95th percentiles
         est_fat = [v for v in est_fat_perc]
         fatalities_prob_dist =[v for v in glb.discretepdf(dist, fat_labels)]
 	fatalities_prob_dist.append(dist.percentile(0.5) if isinstance(dist, mcerp.UncertainFunction) else dist)
