@@ -65,3 +65,9 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Latex documentation
+docs/*.aux
+docs/*.log
+
+
