@@ -69,5 +69,8 @@ target/
 # Latex documentation
 docs/*.aux
 docs/*.log
+docs/*.dvi
+docs/*.out
+docs/*.pdf
 
 
