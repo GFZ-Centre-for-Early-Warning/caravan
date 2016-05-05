@@ -1,0 +1,584 @@
+%preamble
+
+\documentclass[12p]{article}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{wrapfig}
+\usepackage{hyperref} %uncomment to generate hyper links in the text
+%\usepackage{svg} 
+% alterative: using directly inkscape to convert figure to pdf
+% inkscape figure.svg --export-pdf=figure.pdf
+%\usepackage{syntonly}
+%\syntaxonly
+
+\graphicspath{ {images/} }
+%end preamble
+
+
+\begin{document}
+
+\title{
+\includegraphics[width=\textwidth]{banner}
+User Manual \\ \Large software version: v0.2-14-gf8281d3 \\ manual version:
+v0.1}
+%note: to get current version type 'git describe' in the main CARAVAN dev folder
+
+\author{M. Pittore, GFZ-Potsdam,\\ Centre for Early Warning Systems}
+\date{April 2016}
+%\mail{pittore@gfz-potsdam.de}
+\maketitle
+
+\tableofcontents
+
+\newpage
+\section{Introduction}
+\label{sec:intro}
+
+The CARAVAN platform has been designed to provide decision makers and civil
+protection authorities with a tool that allows a prompt estimation of the impact
+of an earthquake. The platform can be used to understand the extent and the
+amount of loss related to the occurrence of a damaging event, in a simple and
+intuitive way. 
+
+The input scenario can be either specified manually using the left-side tab (see
+section \ref{sec:web gui/ev param}), or can be selected from a list of events
+provided by external services (see section \ref{sec:web gui/ev sources}). The
+scenario parameters can be anyway modified, before the computation of related
+ground-motion and loss estimates. For most of the parameters, a related
+uncertainty can be specified. This uncertainty will be consequently propagated
+in the internal computation, and accounted for in the resulting estimates.
+\\
+\\
+\textbf{NOTE}: The CARAVAN platform is still in development and testing. As
+such, some of the described functionalities can be incomplete or can provide
+unexpected results. In order to provide us with suggestions and comments, and a
+prompt feedback on bugs and missing features, write an email to
+\emph{pittore@gfz-potsdam.de}.
+
+\subsection{Structure of the application}
+\label{sec:intro/structure}
+The caravan platform is composed by a three-layered structure, shown in
+fig.~\ref{fig:struct}. The back-end relational database is hosting all necessary
+models for both ground-motion computation and loss estimation. The
+\textbf{database} is based on the well known PostgreSQL/postGIS open-source
+solution, and its extended geographical support allows for a sophisticated
+management of spatial information. 
+\begin{center}
+	\includegraphics[width=\textwidth]{struct_01}
+	\captionof{figure}{Sketch of CARAVAN platform´s structure.
+\label{fig:struct} }
+	
+\end{center}
+In particular, the database hosts the exposure/vulnerability model of the
+Country, which is defined over a specific 2-dimensional tessellation of the
+geographical area.
+
+\textbf{Note}: we define a \emph{tessellation} as a spatial subdivision of a planar surface into a set of neighbouring
+polygons (referred to as geocells) of different shapes and area. 
+
+An example of
+such tessellation is shown in fig.~\ref{fig:tess1}. The tessellation provides
+the basic spatial support of the computation, since every geocell contains all
+necessary data to carry out the different computation stages. The area of the
+geocells is inversely proportional to the estimated number of people living
+within. Therefore, in densely inhabited areas, a spatially denser dataset is
+used, and thus a higher spatial resolution of the resulting estimates. More
+details can be found in section \ref{sec:data model}.
+
+\begin{center}
+	\includegraphics[width=\textwidth]{tess_exposure1}
+	\captionof{figure}{Example of the multi-resolution tessellation used to
+describe the exposure-vulnerability model. The single geocells are color-mapped
+according to their density of inhabitants.\label{fig:tess1} }
+\end{center}
+
+The \textbf{processing modules} are carrying out most of the necessary
+computation. In particular, the ground-motion computation module estimates the
+probabilistic distribution of ground motion, while the loss computation module
+estimates the expected impact in terms of the probabilistic distribution of
+fatalities. Both computation are carried out for each geocell of the
+tessellation, independently and in parallel. More information is provided in
+section \ref{sec:impact comp}. 
+
+The last stage of the CARAVAN platform is the visualization and dissemination
+interface. This component provides the user with a simple set of components for
+the selection and modification of scenario event parameters and processing
+properties. Moreover, an interactive slippy map allows the users to browse the
+processed data. The elements of the interface are described in more detail in
+section \ref{sec:web gui}.
+
+\newpage
+\section{The CARAVAN Web interface}
+\label{sec:web gui}
+
+The CARAVAN main web interface is displayed in fig. \ref{fig:web gui}. The
+simple interface is composed by an interactive map (see section \ref{sec:web
+gui/map}), and a navigation bar hosting both the \emph{event description} and the
+\emph{process settings} (see respectively \ref{sec:web gui/ev param} and
+\ref{sec:web gui/proc param})). A single \emph{run button} is triggering the
+computation.
+
+\begin{center}
+	\includegraphics[width=\textwidth]{caravan_web_gui1}
+	\captionof{figure}{CARAVAN Web graphical User Interface
+(GUI).\label{fig:web gui} }
+\end{center}
+
+The left side bar of the CARAVAN web interface contains the basic functional
+buttons and both the event scenario and the model parameters (described in the
+next sections).
+The basic functional buttons, shown in fig.~\ref{fig:gui ev pars} (left), allow
+the users to activate some of the interface functions. In particular:
+
+\begin{itemize}
+	\item[h)]{\textbf{Multilingual support}. Changes the interface language.
+Currently available languages are: english, german, russian and chinese. More
+languages can anyway be added at a later stage.}
+	\item[m)]{\textbf{Tooltips}. When the tooltips are enabled, by clicking
+on the left-side text of one of the event parameters a pop-up short help will be
+displayed.}
+	\item[p)]{\textbf{GEOFON link}. Opens up the GEOFON event import module.
+This module, if enabled, continuously download from the GEOFON network all
+events occurred in the selected Country within a specific magnitude range
+(currently events with magnitude $>$ 5). \textbf{NOTE: experimental feature}.}
+	\item[n)]{\textbf{FDSN event query}. Opens up the FDSN event import
+module. See section \ref{sec:web gui/ev sources}.}
+\end{itemize}
+
+\subsection{Event description}
+\label{sec:web gui/ev param}
+
+\begin{center}
+	\includegraphics[trim=0mm 20mm 0mm 0mm,clip,
+width=\textwidth]{gui_ev_params_comment}
+	\captionof{figure}{Event description.\label{fig:gui ev pars} }
+\end{center}
+
+The event description (right side, in fig.~\ref{fig:gui ev pars})allows the user to
+define the basic properties of the desired/selected event:  
+
+\begin{itemize}
+	\item[a)]{\textbf{Event location}. Longitude and latitude, in decimal
+degrees, of the event. By typing a sequence of two numbers (separated by either
+spaces, a comma or a semicolon), the coordinate will be considered as following
+a normal (gaussian) distribution, where the first number is the mean, and the
+second the standard deviation. \\ For instance: \fbox{74.0 0.1} means
+that the longitude of the event´s epicentre is defined by a gaussian
+distribution with mean $\mu=74.0$ degrees and standard deviation $\sigma=0.1$
+degrees. In oder terms, considering that 95.5\% of values of a normal distribution lie within a confidence interval 
+of $\mu \pm 2\sigma$, the longitude of the event will be, with probability 95.5\%, in the range $(73.8,74.2)$.}
+	\item[b)]{\textbf{Focal depth}. Indicates the depth of the earthquake´s
+hypocenter, in km. When two values are provided, they will be interpreted as the
+interval of a uniform distribution. For instance: \fbox{10 20} means that
+the hypocentral depth of the event can be comprised anywhere between 10 and 20
+km.}
+	\item[c)]{\textbf{Event magnitude}. Moment magnitude ($M_w$) of the
+event. The magnitude measures the size of the event in terms of the energy
+released, and is based on the seismic moment of the earthquake. When two values
+are provided, they will be interpreted as the interval of a uniform distribution
+(see above).}
+	\item[d)]{\textbf{Type of rupture}. Specifies whether the seismic source
+has to be considered a point, or an extended source. In the latter case, three
+more parameters have to be provided:
+	\begin{itemize}
+		\item[e)]{\textbf{Style of faulting}. fault is a planar fracture
+or discontinuity in a volume of rock, across which there has been significant
+displacement as a result of rock mass movement. Large faults within the Earth's
+crust result from the action of plate tectonic forces, with the largest forming
+the boundaries between the plates, such as subduction zones or transform faults.
+Energy release associated with rapid movement on active faults is the cause of
+most earthquakes. 
+A fault plane is the plane that represents the fracture surface of a fault. A
+fault trace or fault line is the intersection of a fault plane with the ground
+surface. A fault trace is also the line commonly plotted on geologic maps to
+represent a fault. The two sides of a non-vertical fault are known as the
+hanging wall and footwall. By definition, the hanging wall occurs above the
+fault plane and the footwall occurs below the fault.
+
+Based on the direction of slip (the mechanism of rupturing), the faults ruptures
+are usually assigned with different categories (see fig.~\ref{fig:style of
+faulting}), which have to be taken into account in order to estimate the
+resulting ground motion. The possible options are:
+			\begin{center}
+			
+\includegraphics[width=\textwidth]{style_of_faulting}
+				\captionof{figure}{Different faulting
+styles (image courtesy of SMS-Tsunami-Warning.com).\label{fig:style of faulting} }
+			\end{center}
+		\begin{itemize}
+			\item{\emph{Normal}. The block above the fault moves
+down relative to the block below the fault. This fault motion is caused by
+tensional forces and results in extension.}
+			\item{\emph{Reverse}. In a reverse fault, the block
+above the fault moves up relative to the block below the fault. This fault
+motion is caused by compressional forces and results in shortening. A reverse
+fault is called a thrust fault if the dip of the fault plane is small.}
+			\item{\emph{Strike-slip}. In a strike-slip fault, the
+movement of blocks along a fault is horizontal. If the block on the far side of
+the fault moves to the left, as shown in this animation, the fault is called
+left-lateral. If the block on the far side moves to the right, the fault is
+called right-lateral. The fault motion of a strike-slip fault is caused by
+shearing forces.}
+			\item{\emph{Unknown}. Select this option if the style of
+the fault is not known.}
+		\end{itemize}}
+		\item[f)]{\textbf{Fault strike}. The strike is an angle used to
+specify the orientation of the fault and measured clockwise from north. For
+example, a strike of 0° or 180° indicates a fault that is oriented in a
+north-south direction, 90° or 270° indicates east-west oriented structure. To
+remove the ambiguity, we always specify the strike such that when you "look" in
+the strike direction, the fault dips to you right. 
+			\begin{center}
+			
+\includegraphics[trim=0mm 90mm 70mm 0mm, width=\textwidth]{strike_dip}
+				\captionof{figure}{Geometry of
+Strike (left side) and Dip (right side) of a normal or reverse fault (image courtesy of PennState College of Earth and Mineral Science).\label{fig:strike def} }
+			\end{center}}
+		\item[g)]{\textbf{Fault dip}. Indicates the orientation the
+fault is taking from vertical to horizontal. Dip is the angle that describes the
+steepness of the fault surface. This angle is measured from Earth's surface, or
+a plane parallel to Earth's surface. The dip of a horizontal fault is 90
+degrees, and the dip of a vertical fault is 0 degrees. When two values are
+provided, they will be interpreted as the interval of a uniform distribution
+(see above).}
+	\end{itemize}}
+\end{itemize}
+
+\subsection{Process settings}
+\label{sec:web gui/proc param}
+This section of the CARAVAN interface contains several parameters which are
+currently used in the testing phase. A brief description of the parameters is
+provided in the following.
+\\ \\
+\fbox{\textbf{NOTE}: some of these parameters are experimental, therefore we
+suggest not to change them!}
+
+\begin{center}
+	\includegraphics[trim=0mm 40mm 60mm 0mm,clip,
+width=\textwidth]{gui_model_params_comment}
+	\captionof{figure}{Model parameters.\label{fig:gui proc pars} }
+\end{center}
+
+\begin{itemize}
+	\item[a)]{\textbf{Intensity Prediction Equation (IPE)}. Specific IPE to
+be used in the ground motion simulation. More details can be found in
+section~\ref{sec:impact comp/ground motion}.}
+	\item[b)]{\textbf{Target Area}. Selection of the geocells involved in
+the computation can be done based on the minimal expected intensity (e. g. only
+the cells which will experience an intensity I $\ge I_{ref}=5$ will be
+selected), or just the area in view can be selected for the processing.}
+	\item[c)]{\textbf{No-loss binary flag}. If the flag is checked, no loss
+computation will be carried out, only ground motion.}
+	\item[d)]{\textbf{Distribution size (EXPERIMENTAL)}. Size of the
+empirical distribution used to carry out the Montecarlo sampling (suggested
+values: between 40 and 1000).}
+	\item[e)]{\textbf{Active tessellation (EXPERIMENTAL)}. ID of the
+tessellation to be used for the computation.}
+	\item[f)]{\textbf{Reference intensity}. Minimal intensity (in EMS98 /
+MSK64) to be reached or exceeded in a geocell for the cell to be selected for
+computation. The higher is this intensity, the less geocells will be used for
+the computation, and the smaller will be the area involved in the overall
+estimation.}
+	\item[g)]{\textbf{Intensity sample distance (EXPERIMENTAL)}. Minimal
+distance in km between consecutive samples. This parameter is used to compute
+the spatial extent of the area to be involved in the computation.}
+\end{itemize}
+
+\subsection{FDSN event sources}
+\label{sec:web gui/ev sources}
+
+The user of the CARAVAN platform can either create an event scenario by
+specifying all the parameters according to their needs, or an already existing
+event can be downloaded and selected from an external source. 
+Currently, three sources are available, which allow for querying and downloading
+the events contained in their database systems according to the FDSN standard
+format provided by the International Federation of Digital Seismograph Networks
+(see \url{https://www.fdsn.org/webservices/}). Currently the following sources
+have been implemented:
+\begin{itemize}
+	\item{\textbf{EMSC}. The European-Mediterranean Seismological Centre was
+founded in 1975, following a recommendation from the European Seismological
+Commission (ESC). The ESC is a regional commission of the International
+Association of Seismology and Physics of the Earth's Interior (IASPEI), itself a
+specialized association of the International Union of Geodesy and Geophysics
+(IUGG).}
+	\item{\textbf{IRIS}. Incorporated Research Institutions for Seismology.
+IRIS is a consortium of over 120 US universities dedicated to the operation of
+science facilities for the acquisition, management, and distribution of
+seismological data. IRIS provides management of, and access to, observed and
+derived data for the global earth science community.}
+	\item{\textbf{INGV}. the Italian \emph{Istituto Nazionale di Geofisica e
+Vulcanologia} provides access and retrieval of the earthquake information
+contained in the INGV archives.}
+\end{itemize}
+More sources will be added in the future platform releases. 
+ 
+\begin{center}
+	\includegraphics[width=\textwidth]{gui_fdsn}
+	\captionof{figure}{Model parameters.\label{fig:gui fdsn} }
+\end{center}
+
+In order to load a scenario event from a FDSN service, the user has to click on
+the button (see item \emph{n)} in fig.~\ref{fig:gui ev pars} left). A new pop-up
+window will be displayed (see fig.~\ref{fig:gui fdsn}). On the left, the query
+parameters allow to specify the main properties of the desired event. In
+particular it is possible to filter the events based on their geographical
+coordinates (the query is currently initialized with the boundary of Kyrgyztan),
+on their magnitude, focal depth or occurrence date. By clicking on the button
+\emph{Query events} the query is sent and the answer from the remote server is
+parsed and displayed as a table. If the received data include uncertainty
+estimates on some of the parameters, these are displayed as well.
+By clicking on the headers of the different table columns, it is possible to
+sort the list accordingly (e. g. based on the magnitude). 
+Eventually the user can select a specific event by clicking on it, and load it
+into the event description by clikcing on the button \emph{Choose selected}. 
+Once the event has been loaded in the event description, all parameters can be
+further modified before starting over the processsing phases. For instance the
+user can decide to change some of the values, or to manually add uncertainties
+to the parameters in order to account for lack of information in the
+characterization of the scenario.
+
+
+\subsection{Interactive map}
+\label{sec:web gui/map}
+
+The interactive map provides the main interface with the CARAVAN users. The map
+features a tiled background, shown in fig.~\ref{fig:map1}, which provides the
+basic information layer. This background is currently queried from the global,
+opensource OpenStreetMap (OSM, see \url{http://www.osm.org}) initiative.
+OpenStreetMap is built by a community of mappers that contribute and maintain
+data about geographical features, settlements, roads, buildings, and much more
+at a global scale, although with different levels of completeness and quality.
+In Kyrgyzstan, the spatial coverage and thematic detail of OSM map is
+remarkable, and can be efficiently used as a background providing a basic
+geographical framework for the localization of the scenario events. Moreover, in
+Central Asia most of the labels of settlements and topographical features are
+provided natively in Russian language.
+\\
+On top of the tiled map, a vector layer is superimposed when the results from
+the processing stages are available. This vector layer is composed by a set of
+geometric primitives in form of polygons, each with a set of attributes. The
+polygons represent the geocells of the tessellation which have been selected for
+processing (see section \ref{sec:web gui/proc param} and \ref{sec:impact
+comp}). 
+The set of atttributes, as well as the color of the geocells depends on the
+specific layer which is visualized.   
+
+\begin{center}
+	\includegraphics[width=\textwidth]{map1}
+	\captionof{figure}{Interactive map. A graphic symbol denotes the
+location of the event´s epicentre.\label{fig:map1} }
+\end{center}
+
+When visualizing the resulting spatial distribution of ground motion, the
+geocells´ attribute used for visualization is the mean value of macroseismic
+intensity. By hovering the mouse over the geocells, the related probability
+distribution over the different discrete values of intensity is shown in a
+separate, overlaying window. The figure \ref{fig:map2} shows an example of
+resulting distribution. As it is possible to note, in the selected geocell (the
+one the mouse is currently over) the most likely intensity to be experienced is
+7 (we consider EMS-98 and MSK64 scales as effectively equivalent). Nevertheless,
+there is a significant likelihood (40\%) that an intensity 8 will be
+experienced. This distribution encodes the resulting uncertainty over the event
+parameters which is propagated throughout the process, as described in section
+\ref{sec:impact comp/ground motion}.
+
+\begin{center}
+	\includegraphics[width=\textwidth]{map2}
+	\captionof{figure}{Interactive map of ground motion. By hovering the
+mouse on the geocells involved in the computation, the probability distribution
+over the discrete intensity values (in EMS98 / MSK-64) is shown.
+\label{fig:map2} }
+\end{center}
+
+In a similar manner, the user can switch from the visualization of ground motion
+to the visualization of loss. In this case the vector layer superimposed to the
+background tiles will always be composed by the same geocells, but attributes
+related to loss estimation will be visualized instead. 
+In figure \ref{fig:map3} an example related to the ground motion distribution
+shown in fig.~\ref{fig:map2} is provided. The color of the geocells is now
+proportional to the mean of expected fatalities, and a correponding probability
+distribution is provided. In the selected cell the expected value of fatalities
+is 16.3, with a corresponding higher probability of it lying in the 10-20
+interval, but still with a significant probability (almost 20\%) of a number of
+fatalities comprised between 20 and 50. Looking at this distribution we can
+conclude that, given the available information, we can expect with almost 90\%
+probability a number of fatalities between 10 and 50.
+The colormap used, also depicted in the legend shown in the upper-right corner
+of the map, provides an immediate panorama of where the loss are expected, and
+as it is possible to note by comparing the figures \ref{fig:map2} and
+\ref{fig:map3}, not always the locations with higher expected ground motion are
+also the ones where highest loss toll is estimated.
+
+\begin{center}
+	\includegraphics[width=\textwidth]{map3}
+	\captionof{figure}{Interactive map of loss. By hovering the mouse on the
+geocells involved in the computation, the probability distribution over the
+expected number of fatalities is shown. \label{fig:map3} }
+\end{center}
+
+\newpage
+\section{Scenario Impact computation}
+\label{sec:impact comp}
+
+Following the selection of a suitable event scenario in terms of earthquake
+location, magnitude, hypocentral depth and faulting style, the CARAVAN platform
+can start carrying out the necessary processing. The processing stages can be
+split in the following steps:
+\begin{enumerate}
+	\item{The active area, used to select the geocells involved in the
+computation, is estimated.
+\begin{center}
+	\includegraphics[width=\textwidth]{active_area}
+	\captionof{figure}{Geocells included in the estimated active area. Also
+shown are the corresponding mean intensity value for each cell.\label{fig:active
+area} }
+\end{center}}
+	\item{The geocells are queried from the database within the computed
+area.}
+	\item{For each geocell, a separate process is spawned and added to a
+multiprocess pool.}
+	\item{Computation of ground and loss distribution is carried out
+independently and in parallel for each geocell. Every single process in the pool
+is accessing the database for querying the necessary data and writing back the
+resulting estimates. A set of real-time messages are output in the console (see
+figure~\ref{fig:loss proc log}) in the left navigation bar. The log messages
+include the details of the scenario event used for the simulation, the extent of
+the active area based on the event´s properties and the chosen $I_{ref}$, the
+number of active geocells, the elapsed time and the 5-95\% percentiles of the
+resulting disrtribution of loss across the active geocells. In case of warnings
+or errors during the processing, a suitable message is displayed as well in the
+console.}
+	\item{When all processes complete their task, the platform is
+visualizing the resulting distribution according to the layer chosen by the
+user.}
+\end{enumerate} 
+
+In the following sections, further details on the specific processing stages
+related to ground motion and loss estimation are provided.
+
+
+\begin{center}
+	\includegraphics[width=4cm]{proc_log}
+	\captionof{figure}{. \label{fig:loss proc log} }
+\end{center}
+
+\subsection{Ground motion}
+\label{sec:impact comp/ground motion}
+
+Each geocell first computes the distribution of ground motion which is expected
+for the spatial location corresponding to the mass centre of the cell itself
+(called \emph{target}).
+The computation depends on the event´s parameters and the user´s choice of the
+Ground Motion Intensity Prediction Equation (IPE) as shown in
+figure~\ref{fig:ground motion unc prop2}.
+In case uncertainty has been specified for some or all of the event parameters,
+a corresponding distribution is generated and then propagated through the
+computation following a Monte Carlo approach based on the latin-hypercube
+sampling methodology. 
+
+\begin{center}
+	\includegraphics[trim=0mm 30mm 0mm 0mm,clip,
+width=\textwidth]{ground_motion_unc_prop2}
+	\captionof{figure}{. \label{fig:ground motion unc prop2} }
+\end{center}
+
+In figure~\ref{fig:ground motion unc prop1}, upper part, the distributions
+encoding the uncertainty on the location, magnitude and depth of the scenario
+event are shown. These distribution are propagated using a specific IPE
+(actually implemented are either global one proposed by
+\cite{allen_intensity_2012} or the one proposed by \cite{bindi_intensity_2011}
+foe Central Asia) leading to the resulting probability distribution for the
+expected macroseismic intensity in the two spatial locations (targets) which
+represent the baricentres of two geocells (see~\ref{fig:ground motion unc
+prop1}, lower part).
+
+
+\begin{center}
+	\includegraphics[width=\textwidth]{ground_motion_unc_prop1}
+	\captionof{figure}{Association between source model, IPE and event
+parameters.\label{fig:ground motion unc prop1} }
+\end{center}
+
+\subsection{Loss estimation}
+\label{sec:impact comp/loss}
+
+The probabilistic distribution of ground motion estimated for each geocell is
+used then as input for the loss estimation procedure. The exposure and
+vulnerability model, which is also included in the CARAVAN database and
+disaggregated at geocell level, is employed to estimate the expected number of
+collapsed building for each of the considered building types. The exposure and
+vulnerability model for Kyrgyzstan for instance has been developed within
+several international project. The building typologies are described in
+\cite{wieland_towards_2015} and \cite{wieland_multiscale_2015}, and the model
+has been developed following the approach described in
+\cite{pittore_toward_2013}.
+The vulnerability model is based on the methodology developed by
+\cite{giovinazzi_method_2002}, which proposes a more sophisticated version of
+the EMS-98 formulation aimed at vulnerability and risk assessment.
+The Mean Damage Grade (MDG) $\mu_d$ of a building structure subject to a ground
+motion equivalent to macroseismic intensity $I$, in the proposed approach, is
+modelled as:
+
+\begin{equation}
+\mu_d=2.5\left(1+tanh(\frac{I+6.5 V-13.1}{2.3})\right)
+\end{equation}
+
+where $V$ is the vulnerability index associated to the building (or to its
+category). If we consider also the related uncertainties, the vulnerability
+index and the intensity are both described by distributions, as shown in
+figure~\ref{fig:vuln distrib 1}. 
+
+\begin{center}
+	\includegraphics[trim=0mm 30mm 0mm 0mm,clip,
+width=\textwidth]{vuln_distrib_01}
+	\captionof{figure}{Resulting distribution of Mean Damage Grade,
+including the uncertainty in ground motion and vulnerability. In the upper right
+corner, the distribution of the vulnerability index related to two hypotethical
+structures with EMS98 vulnerability A and B. In the lower part, the resulting
+distribution of MDR related to the two target locations A and B shown in the
+upper left inset, resulting from the propagation of the different uncertainties.
+\label{fig:vuln distrib 1} }
+\end{center}
+
+For each building typology, the number of collapsed or heavily damaged
+buildings, respectively corresponding to damage states 5 and 4 on the EMS98
+scale, is used to estimate the expected distribution of fatalities, following
+the approach proposed by Coburn and Spence in 2002
+(\cite{coburn_earthquake_2002}), as shown in figure~\ref{fig:loss formula}.   
+
+\begin{center}
+	\includegraphics[trim=0mm 60mm 30mm
+0mm,clip,width=\textwidth]{loss_formula}
+	\captionof{figure}{Propagation of uncertainties in the computation of
+ground motion.\label{fig:loss formula} }
+\end{center}
+
+
+%\newpage
+%\section{The CARAVAN Data Model}
+%\label{sec:data model}
+%
+%\emph{in construction}
+%
+
+\newpage
+\section{Other training resources}
+\label{sec:training resources}
+
+Several training videos can be accessed online:
+\begin{itemize}
+	\item{basic demo: https://vimeo.com/145905920}
+	\item{fdsn query: https://vimeo.com/145910666}
+\end{itemize}
+
+\newpage
+\section{troubleshooting}
+\emph{in construction}
+
+\bibliography{bibliography/manualv0.1}
+\bibliographystyle{plain}
+
+
+\end{document}
+

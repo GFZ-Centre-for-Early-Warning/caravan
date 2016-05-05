@@ -7,6 +7,7 @@ caravan/static/index.html
 caravan/static/libs/js/lang_dict.js
 caravan/settings/user_options.py
 caravan_db/
+#docs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -64,3 +65,12 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Latex documentation
+docs/*.aux
+docs/*.log
+docs/*.dvi
+docs/*.out
+docs/*.pdf
+
+
