@@ -299,7 +299,7 @@ params ={
     },
 
     gk.DIP: {
-    'default': 0,
+    'default': 90,
     'parse_func': parser.parsefloat,
     'parse_opts':{'interval':[0,360], 'decimals': 0},
     'distrib':'uniform',
