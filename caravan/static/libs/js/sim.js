@@ -186,6 +186,8 @@
 	                //listeners. This way, if the listeners want to have access to scenario_id and session_id, they can
 	                _stop();
 	                fireMsg("Fetching Map Data ...");
+                    //generate report
+                    $.post('generate_report',JSON.stringify({ session_id: se_id }));
 	            }
 
 	            setTimeout(function () {
