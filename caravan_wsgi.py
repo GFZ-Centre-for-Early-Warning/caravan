@@ -38,13 +38,108 @@ import mcerp
 import caravan.settings.globalkeys as gk
 import caravan.fdsnws_events as fe
 
+from jinja2 import Template
+
 CaravanApp = miniwsgi.App()
+
 
 #@CaravanApp.route(url='caravan/static/index.html', headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html',
 #re.compile(r"\.(?:jpg|jpeg|bmp|gif|png|tif|tiff|js|css|xml)$", re.IGNORECASE)
 @CaravanApp.route(url='index.html', headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html',
 def caravan_mainpage(request, response):
-    return request.urlbody
+    '''
+    Accepts a scenario_hash as GET argument and returns an accordingly populated page (form) in which 
+    the graphical results of the simulation will be displayed. 
+    A new page template "main_page_template.html" (located in caravan/static/) has been created for the purpose. 
+
+    The simulation form, for now, is filled completely server-side (only the input elements wich has a "value" attribute).  
+    Additional and more advanced options could be set client-side via javascript as the complete event is written to the page.  
+
+    If no GET argument is given or the given hash is not valid the orginal page will be returned without giving any error, 
+    for now. 
+    '''
+    
+    if request.get and request.get.has_key("id"): 
+        scenario_hash =request.get["id"][0]
+        #scenario_hash ="4888144467514004911"
+        #print(scenario_hash) 
+        
+        scenario =None
+        scenario_id =None
+        session_id =None
+
+        try: 
+            conn =glb.connection(async=True)
+        
+        except Exception as e:
+            print(e)
+            query =[]
+        
+        else:
+            query =conn.fetchall( "select * from processing.scenarios where hash=%s;", (scenario_hash,) )
+
+
+        if len(query) > 0:     
+            scenario =query[0]
+            #print(scenario)
+
+            scenario_id =scenario[0]
+            #print(scenario_id)
+
+            session_id =conn.fetchall( "select * from processing.sessions where scenario_id=%s;", (scenario_id,) )[0][0]
+            #print(session_id)
+
+        conn.close()
+
+
+        if scenario is not None: 
+            scenario_parameters ={}
+                
+            for key, value in glb.params.items():
+                val =None
+
+                if value.has_key("scenario_name"): 
+                    scenario_name =value["scenario_name"]
+
+                    val =scenario[ int( glb.scenario_db_cols[scenario_name] ) -1 ]
+
+                    if hasattr(val, "__iter__"): 
+                        value =str( val[0] )
+
+                        if val[1] > 0 and val[0] != val[1]:     
+                            value +=( ' ' +str( val[1] ) )
+
+                        val =value
+
+
+                if val is None: 
+                    val =value["default"]
+
+                if hasattr(val, "__call__"): 
+                    val =val.__call__()
+
+                scenario_parameters[key] =val
+
+            if scenario_parameters["gm_only"] == '':
+                scenario_parameters["gm_only"] =False
+
+            #print(scenario_parameters)
+
+
+            with open("main_page_template.html", "rb") as f:
+                main_page_template =Template( f.read() )
+                
+
+            return [ main_page_template.render(
+                viewmode="true",
+                session_id=session_id,
+                event_parameters=response.tojson(scenario_parameters, set_content_type=False)[0],
+                scenario_parameters=scenario_parameters
+            )]
+
+    
+    #print("no get arguments given")
+    return [request.urlbody] #shouldn't return an iterable?? wsgi specification 
 
 
 @CaravanApp.route(url='fdsn_query.html', headers={'Content-Type':'text/html; charset=UTF-8'}) #url='caravan/static/index.html',
