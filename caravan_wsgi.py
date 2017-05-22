@@ -86,7 +86,7 @@ def caravan_mainpage(request, response):
             scenario_id =scenario[0]
             #print(scenario_id)
 
-            session_id =conn.fetchall( "select * from processing.sessions where scenario_id=%s;", (scenario_id,) )[0][0]
+            session_id =conn.fetchall( "select * from processing.sessions where scenario_id=%s;", (scenario_id,) )[-1][0] #last, most recent line is picked
             #print(session_id)
 
         conn.close()
