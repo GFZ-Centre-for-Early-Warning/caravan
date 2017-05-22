@@ -1,0 +1,113 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{gensymb}
+\usepackage{graphicx}
+\usepackage[section]{placeins}
+
+\begin{document}
+\section*{Caravan Earthquake Scenario Report}
+\includegraphics[width=12cm]{../imgs/banner0.png}
+A preliminary assessment of expected loss is provided in the following.
+\section*{Earthquake scenario}
+The event occured at 42.70+/{-}0.00 $\degree$ latitude 
+and 74.00+/{-}0.00 $\degree$ longitude, 
+at a depth of 15.00+/{-}0.00 km. 
+The assigned magnitude is Mw 6.8+/{-}0.0. 
+The largest affected settlement is geocell\_id 13078 with about 45000 inhabitants. The median ground motion in macroseimic intensity (EMS{-}98) has been estimated using the global\_wa\_hyp IPE as shown in Fig.\ref{gm_fig}.
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=12cm]{gm.pdf}
+\caption{Estimated median macroseismic intensity}
+\label{gm_fig}
+\end{figure}
+
+
+The maximum intensity, observed in geocell\_id 20268 (usually in correspondence of the epicentre), is VIII. The area where the earthquake could have been felt is approximately 63790 qkm .
+The maximum macroseismic intensity distribution for the largest affected settlement geocell\_id 13078 can be seen in Fig.\ref{gm_barplot}. 
+Table\ref{fat_table} lists the median intensity expected in the 10 largest affected settlements.
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=8cm]{gm_barplot.pdf}
+\caption{Estimated macroseismic intensity distribution}
+\label{gm_barplot}
+\end{figure}
+
+
+\section*{Exposure}
+The affected region can be characterized as an urban region.
+Table\ref{bt_table} shows the 3 dominant residential building types in the target area and their relative percentage alongside their most likely vulnerability class.
+The population has been disaggregated based on the relative frequencies and expected occupation of the residential buildings, in order to compute the estimated number of buildings.
+
+\begin{table}[h!]
+\caption{Building type distribution}
+\label{bt_table}
+\begin{tabular}{c|c|c}
+\hline
+EMCA{-}GEM Building Type&Relative&Most likely vulnerability\\
+\hline
+EMCA4.0 & 0.45 & A \\
+EMCA1.3 & 0.21 & B \\
+EMCA1.1 & 0.11 & B \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\section*{Vulnerability and expected fatalities}
+As we see from Table\ref{bt_table} the buildings within the region are mainly of vulnerability classes A and B.
+Figure\ref{fat_fig} shows the expected distribution of casualties as forecasted by the CARAVAN system.
+The sum of the median expected fatalities over the whole area is 200-500.
+Table\ref{fat_table} shows the most likely order of magnitude of fatalities in the 10 largest settlements in the affected area, the estimated population, and the estimated macroseismic intensity.
+
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=12cm]{social.pdf}
+\caption{Estimated loss distribution}
+\label{fat_fig}
+\end{figure}
+
+
+\begin{table}[h!]
+\caption{Table showing loss, estimated population and estmaied intensity for the 10 most affected locations}
+\label{fat_table}
+\begin{tabular}{c|c|c|c}
+\hline
+Geocell id&Expected casualties&Estimated population&Estimated intensity\\
+\hline
+20256 & 1-10 & 1366 & VII \\
+20351 & 1-10 & 1236 & VI \\
+13446 & 1-10 & 1793 & VI \\
+13519 & 1-10 & 1738 & VI \\
+13499 & 1-10 & 1240 & VII \\
+13637 & 1-10 & 1159 & VI \\
+13469 & 1-10 & 1543 & VI \\
+20195 & 1-10 & 669 & V \\
+13495 & 1-10 & 1546 & VIII \\
+20221 & 1-10 & 472 & VII \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\section*{Disclaimer}
+REWORD !!COPY PASTE FROM PAGER!! CARAVAN results are usually available shortly after an event. 
+However, information on the extent of shaking will be uncertain in the minutes and hours following and earthquake and typically improves as additional data are available.
+CARAVAN is regularly updated and users of CARAVAN hazard and loss estimates should account for uncertainty and always seek the most current CARAVAN release for any earthquake.
+There will be infrequent cases where the CARAVAN estimates will be inaccurate, and even outside the stated range of the postulated uncertainties.
+Population exposure is uncertain and varies by time of day, but these variations are not globally available so they are not currently considered for loss estimates in CARAVAN.
+In addition, CARAVAN model loss calculations are approximate and may be inaccurate for some regions.
+The uncertainties estimated for a given earthquake and for a particular CARAVAN version do not necessarily account for all the uncertainty associated with the estimated losses.
+Potential errors or additional uncertainties in magnitude, location, depth, and shaking characteristics maybe not modeled explicitly and may remain unaccounted for in the CARAVAN loss{-}estimate ranges.
+CARAVAN loss estimates also do not include losses due to tsunami or other secondary hazards (such as fire, liquefaction, and landsliding).
+The CARAVAN system also does not completely account for aftershocks that may add to damage and losses.
+Users of CARAVAN products should understand the potential uncertainties and or inaccuracies associated with CARAVAN's rapid loss{-}estimation capability: Individual or institutional users should use their own judgment and seek additional sources of information or advice before any decision making.
+
+
+\end{document}

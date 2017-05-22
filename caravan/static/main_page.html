@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<!--html file which sets up the webpage-->
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+        <link rel="stylesheet" type="text/css" href="css/layout.css"/>
+        <link rel="stylesheet" type="text/css" href="css/quakelink.css"/>
+        <link rel="stylesheet" type="text/css" href="css/skin.css"/>
+	
+		<script type="text/javascript">
+           
+			var caravan = {
+				imgPath : function(imageName){return "imgs/"+imageName;},
+				params: {"TES": "tess_ids", "GMO": "gm_only", "STR": "str", "SOF": "sof", "DEP": "dep", "IPE": "ipe", "ECL": "econ_loss", "LON": "lon", "FAT": "fatal", "AIR": "aoi_i_ref", "TIM": "tim", "EID": "eid", "MSI": "intens", "LAT": "lat", "AOI": "aoi", "DIP": "dip", "MAG": "mag", "AKS": "aoi_km_step", "DNP": "mcerp_npts"},
+                
+                viewmode : true, 
+                session_id : 24, 
+                event_parameters : {"mag":"5.7 6.5","sof":0,"dep":"10.0","mcerp_npts":40,"gm_only":false,"ipe":2,"lon":"71.46","aoi":null,"aoi_i_ref":5,"tim":"2014","eid":"","str":"90.0","lat":"40.12","dip":90,"aoi_km_step":10,"tess_ids":[1]}
+            }; //define global variable. Everything in here
+		</script>
+        
+		<!-- jquery: remove ".min" if you want debug inspection (loads slower) -->
+        <script src="libs/js/jquery-1.11.1.min.js" type="text/javascript"></script> 
+        <script src="libs/js/common.js" type="text/javascript"></script>
+        <script src="libs/js/popupdiv-new.js" type="text/javascript"></script>
+        <script src="libs/js/tablediv.js" type="text/javascript"></script>
+        <script src="libs/js/sim.js" type="text/javascript"></script>
+
+        <link rel="stylesheet" type="text/css" href="libs/leaflet-0.7.3/leaflet.css"/>
+        <!-- jquery: add "-src" between "leafet" and ".js" if you want debug inspection (loads slower) -->
+        <script src="libs/leaflet-0.7.3/leaflet.js" type="text/javascript"></script>
+        <!-- jquery: remove ".min" if you want debug inspection (loads slower) -->
+        <script src="libs/flot-0.8.3/jquery.flot.min.js" type="text/javascript" ></script>
+        <script src="libs/js/map.js" type="text/javascript"></script>
+	    <script src="libs/js/lang_dict.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            var $ = jQuery;
+            $(document).ready(function () {
+            	var crv = caravan;
+				
+				//customize the "advanced settings" button
+                $('#advanced').click(function () {
+                    var $elm = $(this);
+                    var $elms = $("[data-advanced]").parent();
+                    if ($elms.is(":visible")) {
+                        $elms.hide(0, function () {
+                            $elm.children('img').attr('src', crv.imgPath('arrow-down-01-32.png'));
+                        });
+                        $elm.removeData("value"); //used when starting sim
+                    } else {
+                        $elms.slideDown('fast', function () {
+                            $elm.children('img').attr('src', crv.imgPath('arrow-up-01-32.png'));
+                        });
+                        $elm.data("value", true); //used when starting sim
+                    }
+                    return false;
+                });
+
+                //setting list-like divs (with anchors)
+                $('#ipe').add($('#sof')).each(function (i, elm) {
+                    $(elm).children('a').asOptions(0, null);
+                });
+                $('#tess_ids').children('a').asOptions(null, true, null);
+
+                $('#aoi').children('a').asOptions(0, function (i, $elms) {
+                    var disabled = i == 1;
+                    $('#aoi_i_ref').parent().add($('#aoi_km_step').parent()).find('*').each(function (i, elm) {
+                        var $e = $(elm);
+                        if ($e.is('input')) {
+                            $e.prop("disabled", disabled);
+                        } else {
+                            if (disabled) {
+                                $e.addClass('disabled');
+                            } else {
+                                $e.removeClass('disabled');
+                            }
+                        }
+                    });
+                });
+
+                //NOTE: ORDER IS IMPORTANT. AS #sou WILL AFFECT #ipe selection, the 
+                //latter must come first, 
+                //IF IN FUTURE CHANGES ARE MADE, CONSDIER REARRANGING THE ORDERING, IF NEEDED!!!!!
+                //$('#sou').each(function (i, elm) {
+
+                $('#sou').children('a').asOptions(0, function (i, $elms) {
+
+                    //this function restores the default display of each <a> child of '#ipe' .
+                    //under some circumstances (I don't know why) the inline css 'display' is set to either 'inline' or 'inline-block'
+                    //when the ipe anchor is shown, althought it has a display 'block' (explicitly set in one of the css stylesheet)
+                    //and it's called at the end of jquery show. As jquery actually writes it's display inline css on elements,
+                    //we don't bother for "none" (hide it), we do on the other hand for 'show', as 
+                    //it seems to be buggy (or is it a cache problem? I guess not): 
+                    //For isntance, sometimes it's 'inline', sometimes it's 'inline-block', when in both
+                    //cases should simply be restored to it's default (which is block !)
+                    var f = function () {
+                        $(this).css('display', '');
+                    };
+
+                    //var $parent = $elms.parent().eq(0);
+                    //var id = $parent.attr('id');
+                    var arg = 'fast';
+                    var $vis_elms = $('#sof').parent().add($('#dip').parent()).add($('#str').parent());
+                    var source_extended = $elms.eq(i).attr('id') === 'sou_ext' ? 1 : 0;
+                    if (source_extended) {
+                        $vis_elms.slideDown(arg);
+                    } else {
+                        $vis_elms.hide(/*arg*/);
+                    }
+                    var $ipeList = $('#ipe');
+                    var $ipes = $ipeList.children('a');
+
+                    //control selection of ipes according to their visibility
+
+                    //set visibility
+                    $ipes.each(function (i, elm) {
+                        var $ipeelm = $(elm);
+                        //note: HIDE SHOW IMMEDIATELY AS WE NEED THE PROPERTY JUST BELOW
+                        if ($ipeelm.data("sourcetype") == source_extended) {
+                            $ipeelm.slideDown(f);
+                        } else {
+                            $ipeelm.hide();
+                        }
+                    });
+                    //updating selected ipe's "options":
+                    var $visible = $ipes.filter(":visible");
+                    var $selectedVisible = $visible.filter(".selected");
+                    
+                    if ($selectedVisible.length) {
+                        if ($selectedVisible.length>1){ //safety check 
+                            $selectedVisible.removeClass("selected");
+                            $selectedVisible.eq(0).addClass("selected");
+                        }
+                        $ipeList.data("value", $selectedVisible.eq(0).data("value"));
+                    } else { //none visible
+                        $visible.eq(0).addClass("selected");
+                        $ipeList.data("value", $visible.eq(0).data("value"));
+                    }
+                });
+
+				//table event query:
+				$('#catalog_list').children('a').asOptions(0, function (i, $elms) {
+					$('#catalog').val($elms.eq(i).data('value'));	
+				});
+				//checkboxes:
+				var upd = function(elm){
+					var $elm = $(elm);
+					var disa = !$elm.prop('checked');
+					//two times parent() cause we want the parent tr:
+					$elm.parent().parent().find('input').each(function(i,e){
+						if(e === elm){return;}
+						$(e).prop('disabled', disa);
+					});
+				};
+				$('#_qe_table_query').find('input[type=checkbox]').each(function(i,elm){
+					upd(elm);
+					$(elm).change(function(){upd(this)});
+				});
+                $('#query_events_btn').click(function(){
+                	$('#_qe_container').popSlideDown({invoker:$(this), duration:'fast', toolTip:true, complete:function(){
+       						var iframe = $('#fdsn_frame');
+   							var wdw = iframe.get(0).contentWindow;
+   							if(wdw && wdw.update){
+   								wdw.update(); //update the inner table
+   							}
+       					}
+       				});
+        			return false; //for anchors
+                });
+                
+                //small delay when clicking the query event button to show wait div:
+                $('#query_events_button').click(function(){
+                	$('#waiting_div').showOver($('#_qe_right').find('div.v-wrapper'));
+                	var DELAY = 200;
+                	setTimeout(function(){
+                		$('#query_events_form').submit();
+                	},DELAY);
+                });
+                //hide waiting when iframe has loaded
+                $('#fdsn_frame').load(function() {
+                	$('#waiting_div').hide();
+                });
+                
+                $('#choose_fdsn_event').click(function(){
+					var iframe = $('#fdsn_frame');
+					var wdw = iframe.get(0).contentWindow;
+					var data = wdw.getSelectedItem();
+					for(var k in data){
+						$('#'+k).val(data[k]);
+					}
+					$('#_qe_container').popClose();
+                    
+                    //force repositioning of the epicenter
+                    //(should work, the text fields don't raise any event though)
+                    caravan.map.centerEpicenter();
+                    
+        			return false; //for anchors
+                });
+
+                // quakelink
+                $('#query_events_quakelink_btn').click(function(){
+                    if ($('#_qe_quakelink_container').css('display') == 'none') {
+                        $('#_qe_quakelink_container').popSlideToggle({invoker:$(this), duration:'fast', toolTip:true, complete:function(){
+                                   var iframe = $('#quakelink_frame');
+                                   var wdw = iframe.get(0).contentWindow;
+                                   if(wdw && wdw.update2){
+                                       wdw.update2(); //update the inner table
+                                   }
+                               }
+                           });
+                   } else {
+                       $('#_qe_quakelink_container').popClose();
+                   }
+                    return false; //for anchors
+                });
+
+                //small delay when clicking the query event button to show wait div:
+                $('#query_events_quakelink_button').click(function(){
+                    $('#waiting_div').showOver($('#_qe_quakelink_right').find('div.v-wrapper'));
+                    var DELAY = 200;
+                    setTimeout(function(){
+                        $('#query_events_form').submit();
+                    },DELAY);
+                });
+
+                //hide waiting when iframe has loaded
+                $('#quakelink_frame').load(function() {
+                	$('#waiting_div').hide();
+                });
+
+                $('#choose_quakelink_event').click(function(){
+					var iframe = $('#quakelink_frame');
+					var wdw = iframe.get(0).contentWindow;
+					var data = wdw.getSelectedItem();
+                    console.log(data);
+					for(var k in data){
+						$('#'+k).val(data[k]);
+					}
+					$('#_qe_quakelink_container').popClose();
+
+                    //force repositioning of the epicenter
+                    //(should work, the text fields don't raise any event though)
+                    map.update(data['session_id']);
+                    caravan.map.centerEpicenter();
+
+        			return false; //for anchors
+                });
+
+
+                //help button:
+                $('#show_info').click(function(){
+                	$(this).toggleClass('selected');	
+                	var value = $(this).hasClass('selected');
+                	caravan.dict.help(value);
+					return false; //for anchors
+                });
+
+                //panel visibility button:
+                $('#toggle_panel_visibility').click(function(){
+                	var $this = $(this);
+                	var restore = $this.data('restore');
+                	var $pnl = $('.banner').filter('.v-layout');
+                	var $zoombar = $('.leaflet-control-zoom').filter('.leaflet-bar').filter('.leaflet-control');
+                	var velocity = 'fast';
+                	
+                	if(restore){
+                        $pnl.show(velocity, function(){$this.remove();});
+                	}else{
+                	    $pnl.hide(velocity, function(){
+                            var $newbtn = $this.clone(true, true).
+                                attr('data-doc',"show_panel").
+                                data('restore',true).find('img').
+                                attr('src', caravan.imgPath('arrow-right-01-32.png'));
+                            $newbtn.parent().appendTo($zoombar);
+                        });
+                	}
+					return false; //for anchors
+                });
+                
+                //language stuff:
+                var lngs = crv.dict.langs();
+                var $cl = $('#change_language');
+                if(lngs.length>1){
+                    $cl.html(crv.dict.lang());
+                    $cl.click(function(){
+                        var $d = $('<div>').addClass('languages skinnable-panel raised');
+                        for(var i=0; i<lngs.length; i++){
+                            $d.append($('<a>').html(lngs[i]).attr('href','#').click(function(){
+                                var lang_key = $(this).html(); 
+                                crv.dict.lang(lang_key);
+                                $cl.html(lang_key);
+                                $d.popClose();
+                                return false;
+                            }));	
+                        }
+                        $d.popSlideToggle({invoker:$(this), duration:'fast', toolTip:true});
+                        return false; //for anchors
+                    });
+                }else{
+                	$cl.hide();
+                }
+                //parsing url query (can be done client side. FIXME: necessary?)
+                var urlQueryString = parseURLQueryStr(document.URL);
+                if (urlQueryString) {
+                    for (var k in urlQueryString) {
+                        var elm = $('#' + k);
+                        if (elm && elm.length && elm.val) {
+                            elm.val(urlQueryString[k][urlQueryString[k].length - 1]);
+                        }
+                    }
+                }
+
+              	//setting Leaflet by means of class object map (global variable)
+                var map = crv.initMap("map"); //map is the id of the leaflet map
+                
+                //implementing a global function which returns a value from a 
+                //feature set of data, as returned by the server. NOTE: we could 
+                //implement it more nicely
+                //IMPORTANT: see map.js approx. line 316. Quick doc:
+                // addLayer = function(name, $divLegend, interpolate, styleFcn)
+                
+                map.addLayer('intens', $('#intensLegend'), true,
+                    function(feature, val, colorMap, defOpts){
+                        defOpts.fillColor = colorMap.color(val);
+                    }
+                );
+                map.addLayer('fatal', $('#fatalLegend'), true,
+                    function(feature, val, colorMap, defOpts){
+                        defOpts.fillColor = colorMap.color(val); 
+                        //if val if the index of max, use e.g.: colorMap.color(colorMap.values()[val]);
+                    }
+                );
+                map.addLayer('econ_loss', $('#econLegend'), false, null);
+                 
+                var leaf = L;
+                var isNotIeNorOpera = !leaf.Browser.ie && !leaf.Browser.opera;
+                map.on('mouseover', function(name, layer, feature, featureData, e){
+                    var data = featureData.data;
+                    var val = featureData.value;
+                    if(data===null || data===undefined || val === null || val === undefined){
+                   //     return; //fixme: added to test
+                    }
+                    
+                    e.layer.setStyle({
+                        weight: 1,
+                        fillOpacity: 0.75
+                    });
+                    if (isNotIeNorOpera) {
+                        e.layer.bringToFront();
+                    }
+                    
+                    //now show popup (this is the caravan.map object):
+                    mapPopup.apply(this, [name, feature, featureData, this.getColorMap(name)]);
+                });
+                
+                map.on('mouseout', function(name, layer, feature, featureData, e){
+                    layer.resetStyle(e.layer);
+                    removePopup();
+                });
+                
+                //map.update(450);
+                
+                var plotControl;
+                var plotDiv; //for safety, we don't know if leaflet removes the element 
+                //when the element wrapping control is removed from the map (see below)
+                //see function below:
+                function removePopup(){
+                    if(plotControl){
+                        plotControl.removeFrom(map.getMap());
+                        plotControl = null;
+                        if(plotDiv.parent().length){
+                            plotDiv.remove();
+                            plotDiv = null; //for safety (maybe helps garbage collector?)
+                        }
+                    }
+                }
+                
+                function mapPopup(name, feature, featureData, colorMap){
+                    var $cont = $('<div>').addClass('flot-container').css('display','inline-block'); //take size of its content
+                    var geocell = 'Geocell Id:'; //FIXME: move to dict!!!
+                    
+                    var val = featureData.value;
+                    
+                    //setup plot title:
+                    var $title = $('<div>').addClass('flot-title').html(geocell+feature.id+' '+ crv.dict.title(name)+': '+val).
+                                attr('data-title', name).appendTo($cont);
+                    
+                    //setup plot data:
+                    var data=[];
+                    var bar = {
+                        //label: "Product 1",
+                        data: [],
+                        bars: {
+                            show: true,
+                            //barWidth: 12*24*60*60*300,
+                            fill: true,
+                            lineWidth: 1,   
+                            //order: 1,
+                            fillColor:  "#ffffff"
+                        },
+                        color: "#000000"
+                    };
+                    
+                    //setting data and xticks
+                    var xvalues = colorMap.values();
+                    var xticks=[]; //will be set in the loop below
+                    var xlabels = colorMap.labels() || [];
+                    var shiftLeft = name === 'intens' ? 0.5 : 0; 
+                    var shiftRight = name === 'intens' ? 0.5 : 1; 
+                    for(var i=0; i<xvalues.length; i++){
+                        var obj = $.extend(true, {}, bar);
+                        xticks.push([i, xlabels[i]]);
+                        obj.data.push([i-shiftLeft, featureData.data[i]]);
+                        obj.bars.fillColor = colorMap.color(xvalues[i]);
+                        data.push(obj);
+                    }
+                    
+                    var opts={};
+                    //setup flot chart options:
+                    opts.xaxis = {min: xticks[0][0]-shiftLeft, max: xticks[xticks.length-1][0]+shiftRight};
+                    opts.xaxis.ticks = xticks;
+                    //setting options (axis)
+                    
+                    opts.yaxis = {min: 0, max: 1};
+                    opts.yaxis.ticks = [[0, "0%"],[.25, "25%"],[.5, "50%"],[0.75, "75%"],[1, "100%"]];
+                      
+                    //setup flot chart:
+                    var $placeholder = $('<div>').addClass("flot-placeholder").css({'width':300,'height':200}).appendTo($cont);
+                    //flot complains if the div has no size, this might be due to
+                    //the element being hidden, therefore we first add the element
+                    //This is done in 3 steps:
+                    //1) Remove old control  if any:
+                    removePopup();
+                    
+                    //2) add new one:
+                    plotDiv = $placeholder;
+                    plotControl = map.addControl('topleft', $cont);
+                    //3) setup flot plot:
+                    $.plot($placeholder, data, opts);
+                    
+                }
+                
+                if(caravan.viewmode){
+                    //updating the map, skipping the simulation 
+                    //map.update(caravan.session_id)
+
+                    alert("main")
+                } 
+
+                return false;
+            });
+        </script>
+    </head>
+    <body>
+        <!--This div sets up the event options of the webpage-->
+        <div class="h-layout-left">
+            <div class=h-wrapper>
+                <div class="v-layout banner" >
+                    <div class="v-wrapper"> 
+                       	<div class="toolbar">
+                       		<a id="change_language" href=# class="btn query-events-button" >
+<!--                                	<img src="imgs/arrow-left-01-32.png" data-title="hide_panel"/> -->
+                            </a>
+                            <a data-doc="show_info" id="show_info" href=# class="check" >
+                               	<img src="imgs/info.png" data-title="show_info"/>
+                            </a>
+                            <a data-doc="query_events_from_quakelink" id="query_events_quakelink_btn" href=# class="btn query-events-button" >
+                               	<img src="imgs/quakelink.ico" data-title="query_events_from_quakelink"/>
+                            </a>
+                            <a data-doc="query_events_from_catalog" id="query_events_btn" href=# class="btn query-events-button" >
+                               	<img src="imgs/catalog.png" data-title="query_events_from_catalog"/>
+                            </a>
+                            <a target='_blank' data-doc="report" id="report" href=/caravan/libs/web/viewer.html?file=/caravan/report/report.pdf class="btn report-button">
+                                <img src="imgs/report.png" data-title="report"/>
+                            </a>
+                            <a data-doc="hide_panel" id="toggle_panel_visibility" href=# class="btn query-events-button" >
+                               	<img src="imgs/arrow-left-01-32.png" data-title="hide_panel"/>
+                            </a>
+                       	</div>   
+                        <div id=param_container class="v-layout-center skinnable-panel">
+                            <div class="input-params">
+
+                                <div class="event_params">
+                                    <div class="title">
+                                        <span style='' data-title="event_params_text"></span>
+<!--                                         <a title="Query events from catalog" style='float:right' id="query_events_btn" href=# class="btn query-events-button" > -->
+<!--                                             <img src="imgs/catalog.png" alt="Query events from catalog"/> -->
+<!--                                         </a> -->
+                                    </div>
+                                    <div class="inlineChildren">
+                                        <label for="lon" data-title="lon"></label>
+                                        <input id="lon" value="71.46" data-doc="lon" type="text" />
+                                    </div>
+                                    <div class="inlineChildren">
+                                        <label for="lat" data-title="lat"></label>
+                                        <input id="lat" value="40.12" data-doc="lat" type="text" /> 
+                                    </div>
+                                    <div class="inlineChildren">
+                                        <label for="mag" data-title="mag"></label>
+                                        <input id="mag" value="5.7 6.5" data-doc="mag" type="text" />
+                                    </div>
+                                    <div class="inlineChildren">
+                                        <label for="dep" data-title="dep"></label>
+                                        <input id="dep" value="10.0" data-doc="dep" type="text" /> 
+                                    </div>
+
+                                    <div class="inlineChildren" title="Source Type">
+                                        <label for="sou" >Source</label>
+                                        <div  id="sou" >
+                                            <a class="radio" id="sou_pun" data-title="source_point_text"></a>
+                                            <a class=radio id="sou_ext" data-title="source_extended_text"></a>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="sof"  data-title="sof" style="vertical-align: top"></label>
+                                        <div class="list" id="sof">
+                                            <!--Along the lines of Django template, the variable below will be substituted by the ipes on the server-->
+                                            <!--DO NOT MODIY THE LINE BELOW!!!!!!-->
+                                            <a data-value=1 data-doc="sof">reverse</a> <a data-value=2 data-doc="sof">normal</a> <a data-value=3 data-doc="sof">strike-slip</a> <a data-value=4 data-doc="sof">unknown</a> 
+                                        </div>
+                                    </div>
+                                    <div class="inlineChildren">
+                                        <label for="str" data-title="str"></label>
+                                        <input id="str" value="90.0" type="text" data-doc="str" /> 
+                                    </div>
+                                    <div class="inlineChildren">
+                                        <label for="dip" data-title="dip"></label>
+                                        <input id="dip" value="90" type="text" data-doc="dip"/>
+                                    </div>
+                                </div>
+
+                                <div class="model_params">
+                                    <div class="title">
+                                        <span data-title="model_params_text"></span>
+                                    </div>
+                                    <div>
+                                        <label class="control-label" for=ipe data-title="ipe" style="vertical-align: top"></label>
+                                        <div id="ipe" class="list">
+                                            <!--Along the lines of Django template, the variable below will be substituted by the ipes on the server-->
+                                            <!--DO NOT MODIY THE LINE BELOW!!!!!!-->
+                                            <a data-value=1 data-sourcetype=1 data-doc="GlobalWaRup" >GlobalWaRup</a> <a data-value=2 data-sourcetype=0 data-doc="GlobalWaHyp" >GlobalWaHyp</a> <a data-value=3 data-sourcetype=0 data-doc="CentralAsiaEmca" >CentralAsiaEmca</a> 
+                                            <!--                                            <option value="0" selected="selected">EMCA</option>
+                                                                                        <option value="1">Global</option>-->
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for=aoi data-title="aoi" style='vertical-align: top'></label>
+                                        <div id=aoi class="list">
+                                            <a href="#" data-value='1' data-title='aoi_intensity_ref' data-doc='aoi_intensity_ref' class="selected"></a>
+                                            <a href="#" data-value='2' data-title='aoi_map_rect' data-doc='aoi_map_rect' class="selected"></a>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span></span>
+										<div>
+										<input type="checkbox" id="gm_only" /> <!-- GMO.default either empty or 'checked' -->
+										<label for="gm_only" data-title="gm_only" class="notSelectable">
+                                        
+                                        </label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button class='myButton imgright' id="advanced" data-doc="advanced_text" style='padding:0px 3px'>
+                                            <span style='vertical-align:middle' data-title="advanced_text"></span>
+                                            <img src="imgs/arrow-down-01-32.png"/>
+                                        </button>
+                                    </div>
+                                    <div style='display:none'>
+                                        <label for="mcerp_npts" data-title="mcerp_npts"></label>
+                                        <input data-advanced=true type='number' id="mcerp_npts" value=40 data-doc="mcerp_npts"/>
+                                    </div>
+                                    <div style='display:none'>
+                                        <label for=tess_ids style='vertical-align:top' data-title="tess_ids"></label>
+                                        <div data-advanced=true id=tess_ids class="list">
+                                            <!--Along the lines of Django template, the variable below will be substituted by the ipes on the server-->
+                                            <!--DO NOT MODIY THE LINE BELOW!!!!!!-->
+                                            <a class="selected" data-value=1 data-doc="tess_ids">kg_2016_04</a>
+                                            <!--                                            <option value="0" selected="selected">EMCA</option>
+                                                                                        <option value="1">Global</option>-->
+                                        </div>
+                                    </div>
+                                    <div style='display:none'>
+                                        <label for="aoi_i_ref" data-title="aoi_i_ref"></label>
+                                        <input data-advanced=true type='number' id="aoi_i_ref" value=5 data-doc="aoi_i_ref"/>
+                                    </div>
+                                    <div style='display:none'>
+                                        <label  for="aoi_km_step" data-title="aoi_km_step"></label>
+                                        <input data-advanced=true type='number' id="aoi_km_step" value=10 data-doc="aoi_km_step"/>
+                                    </div>
+                                    <!--TEMPORARILY HIDDEN< NOT USED. MAYBE REMOVE IN FUTURE
+                                    <div style='display:none'> 
+                                        <label class="control-label" for="type">Loss Type</label>
+                                        <select id="type">
+                                            <option value="1" selected="selected">Set of settlements</option>
+                                            <option value="2">Survey towns</option>
+                                        </select>
+                                    </div>
+                                    -->
+                                </div>
+                            </div>
+                        	<div id="simulation-panel" style="display:none">
+                        		<div class="simulation-msgs"></div>
+                        		<div class="pbar-container skinnable-panel">
+                        			<div id="pbar-inner-container">
+                        				<div class="pbar"></div>
+                        				<div class="pbar-text">wait...</div>
+                        			</div>
+                        		</div>
+                        	</div>
+                        </div>
+                        <div class="v-layout-bottom">
+<!--                             <input id='run_button' type="button" value="Run" class="myButton"/> -->
+							<button id='run_button' data-title="run_text" data-doc="run_text" class="myButton"></button>
+                        </div>  
+                    </div>
+                </div>   
+            </div>
+        </div>
+        <div class="h-layout-right">
+            <div class="h-wrapper"></div>
+        </div>
+         <!--MAP/LAYER IMPLEMENTATION
+            div id="map" holds the map
+            New Map/layer options should be implemented in map.js function MapManager
+         -->
+        <div class="h-layout-center">
+            <div class="h-wrapper">
+                <div class="skinnable-panel">
+                    <div id="map" >
+                        
+              
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 
+        	waiting div. For waiting...
+         -->
+        <div style='display:none' id=waiting_div class='waiting' data-title=waiting_text></div>
+        
+        <!-- 
+        	LEGEND IMPLEMENTATIONS 
+        	ANY NEW LEGEND SHOULD BE WRITTEN HERE AND ADDED AS ARGUMENT 
+        	TO caravan.map.addLayer() (see map.js)
+        	They are wrapped in a hidden div so they don't "pollute" the layout
+        	The control showing it is implemented in map.js
+        -->
+        <div style='display:none'>
+        	<div id="fatalLegend" class=legend>
+        		<span data-title="fatal"></span>
+           		<table>    
+                   <tr>
+                       <td data-value=0 style="background-color: #008000"></td> <!--Green -->
+                       <td data-value=1 style="background-color: #FFD700"></td> <!-- gold -->
+                       <td data-value=10 style="background-color: #FF4500"></td> <!-- orangeRed -->
+                       <td data-value=20 style="background-color: #FF0000"></td> <!-- Red -->
+                       <td data-value=50 style="background-color: #E00000"></td> <!-- Red darker-->
+                       <td data-value=100 style="background-color: #CC0000"></td> <!-- Red darker darker -->
+                       <td data-value=200 style="background-color: #CC0000"></td> <!-- Red darker darker -->
+                       <td data-value=500 style="background-color: #CC0000"></td> <!-- Red darker darker -->
+                       <td data-value=1000 style="background-color: #CC0000"></td> <!-- Red darker darker -->
+                   </tr>                                                                                    
+                   <tr>     
+                       <!-- <sup></sup> below, when empty, it's needed for vertical align-->
+                       <td class=legend-label data-label="0<sup></sup>">0<sup></sup></td>
+                       <td class=legend-label data-label="1<sup></sup>">1<sup></sup></td>
+                       <td class=legend-label data-label="10<sup></sup>">10<sup></sup></td>
+                       <td class=legend-label data-label="20<sup></sup>">20<sup></sup></td>
+                       <td class=legend-label data-label="50<sup></sup>">50<sup></sup></td>
+                       <td class=legend-label data-label="100<sup></sup>">100<sup></sup></td>
+                       <td class=legend-label data-label="200<sup></sup>">200<sup></sup></td>
+                       <td class=legend-label data-label="500<sup></sup>">500<sup></sup></td>
+                       <td class=legend-label data-label="10<sup>3</sup>">10<sup>3</sup></td>
+                   </tr>
+               </table>
+           </div>
+			<div id=intensLegend class=legend>
+				<span data-title="intens"></span>
+                <table> 
+                <tr>
+                    <td data-value=4 style="background-color:#FFFF11"></td> 
+                    <td data-value=5 style="background-color:#FFD700"></td>
+                    <td data-value=6 style="background-color:#FFAA00"></td>
+                    <td data-value=7 style="background-color:#FF5500"></td>
+                    <td data-value=8 style="background-color:#FF0000"></td>
+                    <td data-value=9 style="background-color:#D00000"></td>
+                    <td data-value=10 style="background-color:#A00000"></td>
+                    <td data-value=11 style="background-color:#900000"></td> 
+                </tr>  
+                <tr> 
+                    <td class=legend-label data-label="&le;IV">&le;IV</td>
+                    <td class=legend-label data-label="V">V</td>
+                    <td class=legend-label data-label="VI">VI</td>
+                    <td class=legend-label data-label="VII">VII</td>
+                    <td class=legend-label data-label="VIII">VIII</td>
+                    <td class=legend-label data-label="IX">IX</td>
+                    <td class=legend-label data-label="X">X</td>
+                    <td class=legend-label data-label="&ge;XI">&ge;XI</td>
+                </tr>
+               </table>
+           </div> 
+           <div id="econLegend" class=legend>
+           		<span data-title="econ_loss"></span>
+           		<table>    
+              		<tr>
+	                  <td data-value=0 style="background-color:rgb(44,123,182)"></td>
+	                  <td data-value=1 style="background-color:rgb(178,220,229)"></td>
+	                  <td data-value=10 style="background-color:rgb(239,248,198)"></td>
+	                  <td data-value=100 style="background-color:rgb(253,181,105)"></td>
+	                  <td data-value=1000 style="background-color:rgb(228,79,53)"></td>
+	           		</tr>                                                                                    
+                    <tr>     
+	                    <td class=legend-label>0</td>
+	                    <td class=legend-label>1M</td>
+	                    <td class=legend-label>10M</td>
+	                    <td class=legend-label>100M</td>
+	                    <td class=legend-label>1000M</td>
+                	</tr>
+            	</table> 
+        	</div> 
+           
+        </div>
+        
+        <!-- flot placeholder-->
+        <div id='flot-container' style='display: none'>
+            <div id='flot-title'></div>
+            <div id="flot-placeholder" style='width:450;height:300'></div>
+        </div>
+		<!--  event query div, appended to the body -->
+		
+		<div id="_qe_container" class="skinnable-panel raised v-layout v-no-bottom" style='display:none'>
+			<div class="v-wrapper">
+				<div class="v-layout-top">
+					<div class="title">Query event from Catalog 
+					<!-- this was the close button. Hide it cause otherwise the fdsn event query dialog seems a window,
+                        and in fact it has a popup behavior (e.g., hide it on focus lost). If you want to uncomment it,
+                         you need to implement also the hide action (the anchor below is not attached to any event)
+                        <a id="_qe_close_btn" style="float:right" href="#"><img title="close" src="imgs/close.png"></a>
+					-->
+                    </div>
+				</div>
+				<div class="v-layout-center">
+					<div id="_qe_left" class="h-layout-left">
+						<div class="h-wrapper">
+							<div class="v-layout v-no-top">
+								<div class="v-wrapper">
+									<form id=query_events_form method="post" action="fdsn_query.html" target="fdsn_frame"> <!-- enctype="multipart/form-data"  -->
+									<table id="_qe_table_query" class="v-layout-center-">
+										<tbody>
+											<tr>
+												<td>Catalog</td>
+												<td colspan="2">
+													<div id=catalog_list class="list">
+                                        				<a href=# data-value="EMSC">EMSC</a><a href=# data-value="IRIS">IRIS</a><a href=# data-value="INGV">INGV</a>
+													</div>
+													<input name=catalog id=catalog type=hidden value="" />
+												</td>
+											</tr>
+											<tr>
+												<td></td>
+												<td>Min</td>
+												<td>Max</td>
+											</tr>
+											<tr>
+												<td>
+													<input id="lat_eqc" type="checkbox">
+													<label data-title="lat" for="lat_eqc" class="notSelectable"></label>
+												</td>
+												<td><input name="lat" value="38.5"></td>
+												<td><input name="lat" value="44"></td>
+											</tr>
+											<tr>
+												<td>
+													<input id="lon_eqc" type="checkbox">
+													<label data-title="lon" for="lon_eqc" class="notSelectable"></label>
+												</td>
+												<td><input name="lon" value="68.5"></td>
+												<td><input name="lon" value="81"></td>
+											</tr>
+											<tr>
+												<td>
+													<input id="dep_eqc" type="checkbox">
+													<label data-title="dep" for="dep_eqc" class="notSelectable"></label>
+												</td>
+												<td><input name="dep" value="15"></td>
+												<td><input name="dep" value="15"></td>
+											<tr>
+												<td>
+													<input id="mag_eqc" type="checkbox">
+													<label data-title="mag"  for="mag_eqc" class="notSelectable"></label>
+												</td>
+												<td><input name="mag" value="6.8"></td>
+												<td><input name="mag" value="6.8"></td>
+											<tr>
+												<td>
+													<input id="tim_eqc" type="checkbox">
+													<label data-title="tim" for="tim_eqc" class="notSelectable"></label>
+												</td>
+												<td><input name="tim" value="2014"></td>
+												<td><input name="tim" value="2014"></td>
+											</tr>
+										</tbody>
+									</table>
+									<div id="_qe_left_bottom" class="v-layout-bottom">
+										<!--  the type attribute prevents the button from submitting the form -->
+										<button id=query_events_button type=button data-title=query_events data-doc=query_events class="myButton"></button>
+									</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div> 
+					<div id="_qe_right" class="h-layout-center">
+						<div class="h-wrapper">
+							<div class="v-layout v-no-top">
+								<div class="v-wrapper"> 
+									<div id="_qe_result_table" class="v-layout-center">
+										<iframe src='fdsn_query.html'id='fdsn_frame' name='fdsn_frame' class='fdsn_frame'></iframe>
+									</div>
+									<div id="_qe_right_bottom" class="v-layout-bottom">
+										<span id="_qe_right_bottom_info"></span><button id=choose_fdsn_event data-title=choose_selected_event data-doc=choose_selected_event class="myButton"></button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<!--  quakelink query div, appended to the body -->
+		<div id="_qe_quakelink_container" class="skinnable-panel raised v-layout v-no-bottom" style='display:none'>
+			<div class="v-wrapper">
+				<div class="v-layout-top">
+					<div class="title">Query preprocessed event from Quakelink
+					<!-- this was the close button. Hide it cause otherwise the fdsn event query dialog seems a window,
+                        and in fact it has a popup behavior (e.g., hide it on focus lost). If you want to uncomment it,
+                         you need to implement also the hide action (the anchor below is not attached to any event)
+                        <a id="_qe_close_btn" style="float:right" href="#"><img title="close" src="imgs/close.png"></a>
+					-->
+                    </div>
+				</div>
+                <div class="v-layout-center">
+                    <div id="_qe_left" class="h-layout-left">
+                        <div class="h-wrapper">
+                            <div class="v-layout v-no-top">
+                                <div class="v-wrapper">
+
+                                    <div id="_qe_left_bottom" class="v-layout-bottom">
+                                        <!--  the type attribute prevents the button from submitting the form -->
+                                    </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="_qe_right" class="h-layout-center">
+                        <div class="h-wrapper">
+                            <div class="v-layout v-no-top">
+                                <div class="v-wrapper">
+                                    <div id="_qe_result_table" class="v-layout-center">
+                                        <iframe src='quakelink_query.html'id='quakelink_frame' name='quakelink_frame' class='quakelink_frame'></iframe>
+                                    </div>
+                                    <div id="_qe_right_bottom" class="v-layout-bottom">
+                                        <span id="_qe_right_bottom_info"></span><button id=choose_quakelink_event data-title=choose_selected_event data-doc=choose_selected_event class="myButton"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			</div>
+		</div>
+
+    </body>
+</html>

@@ -1,0 +1,10 @@
+# GMT 5 Session common arguments shelf
+BEGIN GMT 5.2.1
+B	1/.2:Probability:/:Intensity:WSne:.Geocell id 13078:
+J	x
+JM	M5i
+Jx	x1/4
+R	4/11/0/1
+Y	2i
+L	2
+END

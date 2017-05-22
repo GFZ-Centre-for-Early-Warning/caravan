@@ -1,0 +1,4 @@
+DCW-GMT is distributed under the GNU Lesser General Public License (LGPL)
+version 3 or later. Copies of the The GNU General Public License (GPL) and
+the GNU Lesser General Public License (LGPL) are distributed along with
+the sources. Refer to the files COPYINGv3 and COPYING.LESSERv3.
