@@ -384,7 +384,6 @@ jQuery(document).ready(function () {
     var $ = jQuery;
     
     if(caravan.viewmode){
-        alert("merda");
         try{
 
         $runBtn.click( function(){
@@ -464,7 +463,6 @@ jQuery(document).ready(function () {
             };
 
             var startRun = function () {
-                    alert("cazzo")
                     //removing/hiding visible elements and then adding/setting to visible other elements causes two width variation to the parent div, 
                     //causing two unuseful resize to the map.
                     //Therefore, perform a dummy width set and then release it
