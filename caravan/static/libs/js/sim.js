@@ -207,7 +207,7 @@ function simulation_init(crvn){
 	        });
 	    };
 	
-	    this.start = function () {
+	    this.start = function ( event ) {
 	        //optional_callback is passed the argument returned by the server, usually a dict with session_id and scenario_id
 	        if (_status !== STATUS_READY) {
 	            return;
@@ -384,52 +384,50 @@ jQuery(document).ready(function () {
     var $ = jQuery;
     
     if(caravan.viewmode){
-        try{
+        //Avoid initializing the simulation (as it may not be needed), saving the client some javascript.
+        //When the run button is clicked the input parameters are compared with the ones set by the server, 
+        //if differences are found the simulation is run, else a message is shown to the user. 
+        //This should save some work to the server. 
 
         $runBtn.click( function(){
 
             function is_the_same_event(client_event, server_event){
-                var differs =[]; 
-                var the_same =[]; 
 
                 for(var key in client_event){
-                    if(client_event[key] == server_event[key]){
-                        the_same.push(key); 
-
-                    }else{
-                        differs.push(key); 
-
+                    if(client_event[key] != server_event[key]){
                         return false; 
                     }
-                }
+                }   
 
-                return true; 
-                //alert( the_same.length +" items: " +the_same.toString() );
-                //alert( differs.length +" items: " +differs.toString() );
+                return true;
             } 
             
             event =getEvent(); 
             
-            if( is_the_same_event(event, caravan.event_parameters) ){
-                alert("the same event, change something"); 
-            
-            }else{ //exit the view mode and get back to normal mode 
+            if( is_the_same_event(event, caravan.event_parameters) ){ 
+                //it would be better to implement a nicer way to interact with the user, 
+                //maybe a message on the screen like the "UPDATING MAP ..." one or something similar
+                
+                alert("please change some parameter to run the simulation"); 
+
+            }else{ 
+                //exit the view mode and get back to the normal one, 
+                //initializing all the relevant variables and functions for the simulation
                 
                 caravan.viewmode =false; 
+
+                $runBtn.off("click"); 
 
                 simulation_init(caravan);   
                 simulation_init2(); 
 
+                //emulating a click on the run button
+                //maybe not very elegant but saves some troubles as startRun() is hidden inside simulation_init2()
                 $runBtn.click(); 
             }
         }); 
-
-        }catch(e){
-            alert(e); 
-        }
- 
-    }else{
     
+    }else{
         simulation_init(caravan); 
         simulation_init2(); 
     }
@@ -437,126 +435,125 @@ jQuery(document).ready(function () {
 
     function simulation_init2 (){
 
-            //sets the run text. Due to the caravan policy, we set both the data-title
-            //and the html attribute
-            function setRunText(key){
-                    $runBtn.attr('data-title',key);
-                    $runBtn.html(crv.dict.title(key));
-            }
+        //sets the run text. Due to the caravan policy, we set both the data-title
+        //and the html attribute
+        function setRunText(key){
+            $runBtn.attr('data-title',key);
+            $runBtn.html(crv.dict.title(key));
+        }
 
-            var crv = caravan;
-            var sim = crv.sim;
-            var dict = crv.dict;
-            //little note: $cont has two panels: one for the input params and the other
-            //holding the simulation stuff ($sim_panel below)
-            //$sim_panel has a simulation message panel and (bottom) a progress bar container panel
-            var $cont = $('#param_container');
-            var $sim_panel = $('#simulation-panel');
-            var velocity = 'fast';
+        var crv = caravan;
+        var sim = crv.sim;
+        var dict = crv.dict;
+        //little note: $cont has two panels: one for the input params and the other
+        //holding the simulation stuff ($sim_panel below)
+        //$sim_panel has a simulation message panel and (bottom) a progress bar container panel
+        var $cont = $('#param_container');
+        var $sim_panel = $('#simulation-panel');
+        var velocity = 'fast';
 
-            var $ta = $cont.find('.simulation-msgs');
-            var $pbar = $cont.find('.pbar');
-            var $pbarText = $cont.find('.pbar-text');
+        var $ta = $cont.find('.simulation-msgs');
+        var $pbar = $cont.find('.pbar');
+        var $pbarText = $cont.find('.pbar-text');
 
-            var stopRun = function () {
-                    sim.stop();
-            };
+        var stopRun = function () {
+            sim.stop();
+        };
 
-            var startRun = function () {
-                    //removing/hiding visible elements and then adding/setting to visible other elements causes two width variation to the parent div, 
-                    //causing two unuseful resize to the map.
-                    //Therefore, perform a dummy width set and then release it
+        var startRun = function () {
+            //removing/hiding visible elements and then adding/setting to visible other elements causes two width variation to the parent div, 
+            //causing two unuseful resize to the map.
+            //Therefore, perform a dummy width set and then release it
 
-                    $cont.css('width', $cont.css('width'));
-                    //$cont width explicitly set: it will not stretch/shrink while adding/removing,
-                    //which is visually nicer and does not call map resizing and unuseful gui related calculation stuff
-                    //now proceed:
-                    $cont.children('.input-params').hide(velocity, function () {
-                                    var $div = $sim_panel;
-                                    //restore progressbar, if it was hidden from a previous simulation end/stop
-                                    //If you change code here, change also lines in registerListener below (should do the 'opposite')
-                                    $div.find('.pbar-container').show();
-                                    $div.find('.simulation-msgs').css('bottom', '').html(""); //empty its content
+            $cont.css('width', $cont.css('width'));
+            //$cont width explicitly set: it will not stretch/shrink while adding/removing,
+            //which is visually nicer and does not call map resizing and unuseful gui related calculation stuff
+            //now proceed:
+            $cont.children('.input-params').hide(velocity, function () {
+                var $div = $sim_panel;
+                //restore progressbar, if it was hidden from a previous simulation end/stop
+                //If you change code here, change also lines in registerListener below (should do the 'opposite')
+                $div.find('.pbar-container').show();
+                $div.find('.simulation-msgs').css('bottom', '').html(""); //empty its content
 
-                                    $div.css('display','block'); //default for divs. I Do not use show as we are not sure what display it sets
+                $div.css('display','block'); //default for divs. I Do not use show as we are not sure what display it sets
 
-                                    //#pbar-text: vertically center text. This cannot be done with css easily as it works for non absolutely positioned elements
-                                    //so we set line-height equal to the element height:
-                                    $pbarText.css('line-height', $pbarText.css('height'));
-                                    sim.start(); //harmless if already running (true after code changes? check it)
-                                    });
-            };
-
-
-            var restoreRun = function(){
-                    $sim_panel.hide();
-                    $sim_panel.siblings().show(velocity, function () {
-                                    //remove css property set in startGUIRun
-                                    $cont.css('width', '');
-                                    setRunText('run_text');
-                                    $runBtn.off('click').click(startRun);
-                                    });
-            };
-
-            $runBtn.click(startRun);
-
-            sim.registerListener('status', function (oldState, newState) {
-                            $runBtn.prop('disabled', newState === sim.STARTING || newState === sim.STOPPING);
-                            //hide toolbar buttons to avoid weird behaviours (e.,g. changing dict, showing help)
-                            //which are all stuff complex to handle and which are likely to appear as bug even if they aren't:
-                            $('.banner').find('.toolbar').css("visibility",newState === sim.READY ? "" : "hidden");
-                            $runBtn.off('click');
-                            //as this method is called when the state changes, oldState is never READY so we can safely assume
-                            //we need to go back now:
-                            if (newState === sim.READY) {
-                            //first reset the pbar
-                            var $pbar = $sim_panel.find('.pbar');
-                            var $pbarText = $sim_panel.find('.pbar-text');
-                            $pbar.css('width',0);
-                            $pbarText.html('wait...');
-                            //hide progressbar and stretch sim messages. 
-                            //If you change code here, change also lines in startRun (should do the 'opposite')
-                            $sim_panel.find('.pbar-container').hide(velocity);
-                            $sim_panel.find('.simulation-msgs').css('bottom', '0px');
-
-                            setRunText('goback_text');
-                            $runBtn.off('click').click(restoreRun);
-                            }else if (newState === sim.RUNNING){
-                                    setRunText('cancel_text');
-                                    $runBtn.off('click').click(stopRun);
-                            }
+                //#pbar-text: vertically center text. This cannot be done with css easily as it works for non absolutely positioned elements
+                //so we set line-height equal to the element height:
+                $pbarText.css('line-height', $pbarText.css('height'));
+                sim.start(); //harmless if already running (true after code changes? check it)
             });
+        };
+    
 
-            sim.registerListener('msg', function (mzg) {
-                            try {
-                            for (var i = 0; i < mzg.length; i++) {
-                            var m = mzg[i];
-                            var $span = $("<span>");
-                            if(m.indexOf("WARNING: ")==0){
-                            m = m.replace("WARNING: ","<img src='"+crv.imgPath('warning.png')+"' alt='WARNING: '/>");
-                            $span.addClass("warning");
-                            }else if(m.indexOf("ERROR: ")==0){
-                            m = m.replace("ERROR: ","<img src='"+crv.imgPath('cancel.png') + "' alt='ERROR: '/>");
-                            $span.addClass("error");
-                            }
-                            $ta.append($span.html(m));
-                            }
-                            } catch (err) {
-                            return;
-                            }
-                            //scroll to the bottom of the div:
-                            $ta.scrollTop($ta.prop("scrollHeight"));
-                            });
+        var restoreRun = function(){
+            $sim_panel.hide();
+            $sim_panel.siblings().show(velocity, function () {
+                //remove css property set in startGUIRun
+                $cont.css('width', '');
+                setRunText('run_text');
+                $runBtn.off('click').click(startRun);
+            });
+        };
 
-            sim.registerListener('progress', function(completed, remainingTime, remainingTimeStr){
-                            var dataPercent = completed.toFixed(0) + "%"; 
-                            $pbar.css('width', dataPercent);
-                            if (remainingTimeStr) { //empty if remainingTime < 1
-                            remainingTimeStr = "  (" + remainingTimeStr + " left)";
-                            }
-                            dataPercent += remainingTimeStr;
-                            $pbarText.html(dataPercent);
-                            });
+        $runBtn.click(startRun);
 
+        sim.registerListener('status', function (oldState, newState) {
+            $runBtn.prop('disabled', newState === sim.STARTING || newState === sim.STOPPING);
+            //hide toolbar buttons to avoid weird behaviours (e.,g. changing dict, showing help)
+            //which are all stuff complex to handle and which are likely to appear as bug even if they aren't:
+            $('.banner').find('.toolbar').css("visibility",newState === sim.READY ? "" : "hidden");
+            $runBtn.off('click');
+            //as this method is called when the state changes, oldState is never READY so we can safely assume
+            //we need to go back now:
+            if (newState === sim.READY) {
+                //first reset the pbar
+                var $pbar = $sim_panel.find('.pbar');
+                var $pbarText = $sim_panel.find('.pbar-text');
+                $pbar.css('width',0);
+                $pbarText.html('wait...');
+                //hide progressbar and stretch sim messages. 
+                //If you change code here, change also lines in startRun (should do the 'opposite')
+                $sim_panel.find('.pbar-container').hide(velocity);
+                $sim_panel.find('.simulation-msgs').css('bottom', '0px');
+
+                setRunText('goback_text');
+                $runBtn.off('click').click(restoreRun);
+            }else if (newState === sim.RUNNING){
+                setRunText('cancel_text');
+                $runBtn.off('click').click(stopRun);
+            }
+        });
+
+        sim.registerListener('msg', function (mzg) {
+            try {
+                for (var i = 0; i < mzg.length; i++) {
+                    var m = mzg[i];
+                    var $span = $("<span>");
+                    if(m.indexOf("WARNING: ")==0){
+                        m = m.replace("WARNING: ","<img src='"+crv.imgPath('warning.png')+"' alt='WARNING: '/>");
+                        $span.addClass("warning");
+                    }else if(m.indexOf("ERROR: ")==0){
+                        m = m.replace("ERROR: ","<img src='"+crv.imgPath('cancel.png') + "' alt='ERROR: '/>");
+                        $span.addClass("error");
+                    }
+                    $ta.append($span.html(m));
+                }
+            } catch (err) {
+                return;
+            }
+            //scroll to the bottom of the div:
+            $ta.scrollTop($ta.prop("scrollHeight"));
+        });
+
+        sim.registerListener('progress', function(completed, remainingTime, remainingTimeStr){
+            var dataPercent = completed.toFixed(0) + "%"; 
+            $pbar.css('width', dataPercent);
+            if (remainingTimeStr) { //empty if remainingTime < 1
+                remainingTimeStr = "  (" + remainingTimeStr + " left)";
+            }
+            dataPercent += remainingTimeStr;
+            $pbarText.html(dataPercent);
+        });
     }
 });
