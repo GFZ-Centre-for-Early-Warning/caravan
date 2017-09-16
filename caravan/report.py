@@ -355,7 +355,7 @@ def generate_barplot(impact_data,locations_data,measure,fname):
     cmd="psconvert -A -P -Tf {}".format(fname)
     os.system(cmd)
 
-def report(session_id, directory=None):
+def report(session_id):
     '''
     Function that generates a report for the event
     '''
@@ -363,12 +363,7 @@ def report(session_id, directory=None):
     #working directory
     ###########
     old_cwd = os.getcwd() #for changing back at the end
-    
-    if directory is None:  
-        new_cwd = os.path.dirname(os.path.realpath(__file__))+'/static/report/'
-    else: 
-        new_cwd = directory
-
+    new_cwd = os.path.dirname(os.path.realpath(__file__))+'/static/report/'
     os.chdir(new_cwd)
     ###########
     #gather data
