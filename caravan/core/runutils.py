@@ -68,6 +68,7 @@ class RunInfo(object):
                     #raise e
             return self
     
+
     def setprocess(self, process, session_id):
         with self.__lock:
             
@@ -81,6 +82,16 @@ class RunInfo(object):
                 self.__session_id = session_id
                 
             return True
+    
+
+    # these two functions were added to let set from outside the session_id and status 
+    # used to fake a completed simulation on the RunInfo object
+    def setsession_id(self, session_id): 
+        self.__session_id = session_id
+        
+    def setstatus(self, status): 
+        self.__status = status
+
         
     def scenario(self):
         with self.__lock:
