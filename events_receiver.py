@@ -45,6 +45,9 @@ param = {
 
 ## Settings section end
 
+events_folder_location = os.path.abspath(events_folder_location)
+events_folder = os.path.join(events_folder_location, events_folder_name)
+
 
 # creating the source object
 source = simpleclient.HMB(
@@ -102,6 +105,11 @@ def handle_event(event):
 
 
 def main(): 
+    # creating events_folder if it does not exists 
+    if not os.path.isdir(events_folder): 
+        os.makedirs(events_folder)
+
+
     while True:
         events = source.recv()
     
