@@ -3,7 +3,7 @@ Retrieving events from Geofon (for now) and passing them to loca_run.py.
 Event information are saved in folders (named after the event's id). 
 In the same folder will be saved the report after simulation is completed. 
 
-run simply as: 
+run as simply as: 
 python3 events_receiver.py
 '''
 
@@ -14,15 +14,20 @@ import simpleclient
 import shutil
 import time
 
+from caravan.settings.shared import events_folder_name, events_folder_location
 
-## Settings section begin, some should be moved to the main settings file 
 
-# will hold reports related to events gathered by qmlreceiver 
-events_folder_name = "local_events"
+## Settings section begin
+
+# These settings were moved caravan.settings.shared (so that caravan_wsgi.py could have access to them), 
+# see import above
+
+# will hold reports related to events gathered by events_receiver 
+#events_folder_name = "local_events"
 # and will reside in events_folder_location
-events_folder_location = "./"
+#events_folder_location = "./"
 
-#qmlreceiver parameters
+#simpleclient parameters
 RETRY_WAIT = 10
 source = "https://ingv:ingv@geofon.gfz-potsdam.de/hmb/qml"
 timeout = 120
@@ -39,15 +44,6 @@ param = {
 }
 
 ## Settings section end
-
-
-# probably a good choice to work with absolute paths, as they are always unique
-events_folder_location = os.path.abspath(events_folder_location)
-events_folder = os.path.join(events_folder_location, events_folder_name)
-
-# creating the event_folder folder if it does not exist
-if not os.path.isdir(events_folder):
-    os.makedirs(events_folder)
 
 
 # creating the source object
@@ -115,7 +111,6 @@ def main():
         
             elif event["type"] == "EOF":
                 print("Waiting for next events in real time")
-
 
 
 if __name__ == "__main__": 
