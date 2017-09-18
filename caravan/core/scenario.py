@@ -23,6 +23,7 @@ __date__ ="$Sep 26, 2014 3:18:42 PM$"
 
 
 from __builtin__ import hash as builtin_hash
+import hashlib
 import caravan.settings.globals as glb
 from gmpes.gmpes import getgmpe
 import caravan.settings.globalkeys as gk
@@ -151,7 +152,57 @@ class Scenario(dict):
         self.__db = {}
         self.__dbhash = None
         self.update(*args, **kwargs) #note: pass args as positional arguments, not as (single) list owning those arguments
+        self.__text = None
+        self.dbtext() # holds a string representation of the scenario, it will be used to evaluate the hash  
+        self.dbhash() # why not just generating the hash upon initialization? Parameters wont change from now on
+
+
+    # holds a string representation of the scenario, it will be used to evaluate the hash  
+    def dbtext(self): 
+        if self.__text is None: 
+            self.__text = ""
+            
+            for key, value in self.__db.items():       
+                self.__text +=( str(key) +":") 
+               
+                if "parse_opts" in glb.params[key] and "decimals" in glb.params[key]["parse_opts"]: 
+                    decimals = int( glb.params[key]["parse_opts"]["decimals"] )
+                    self.__text +=( self.__extend_to_proper_lenght__(value, decimals) +';' ) 
+                
+                else: 
+                    self.__text +=( str(value) +';' )
+
+            self.__text = self.__text.rstrip(';')
+
+        return self.__text
+
+    
+    # expends parameters to proper length (important for creating dbtext)
+    def __extend_to_proper_lenght__(self, value, decimals): 
+
+        if hasattr(value, "__iter__"): 
+            value_str = "("
+
+            for i in value: 
+                value_str +=( self.__extend_to_proper_lenght__(i, decimals) +"," )
+            
+            value_str = value_str.rstrip(',')
+            value_str += ")"
+
+        else: 
+            value_str = str(value)
+            
+            if decimals > 0 and not "." in value_str: 
+                value_str += "."
+
+            zeroes_to_append = decimals -( len(value_str) -(value_str.find('.') +1) )
+
+            if zeroes_to_append > 0: 
+                value_str +=( '0' *zeroes_to_append )
         
+        return value_str
+
+
     def __setitem__(self, key, value):
         
         params = glb.params
@@ -172,6 +223,7 @@ class Scenario(dict):
             
         super(Scenario, self).__setitem__(k_low, value)
               
+
     def update(self, *args, **kwargs):
         if args:
             if len(args) > 1:
@@ -227,12 +279,25 @@ class Scenario(dict):
         #leave it like this??!!
         return self[gk.IPE](**d)
     
+
     def dbhash(self):
-        if self.__dbhash is None: #lazily calculate it (it is set to None at startup and any time a key which has a 
-        #parameter in glb.params p is found (and p must have the key _scenario_name)
-            self.__dbhash = scenario_hash(self.__db)
+        if self.__dbhash is None: 
+            # lazily calculate it (it is set to None at startup and any time a key which has a 
+            # parameter in glb.params p is found (and p must have the key _scenario_name)
+            #self.__dbhash = scenario_hash(self.__db)
+            
+            # switching hashing mechanism to md5, in hexadecimal format 
+            # note that hexdigest needs to be shortened and casted to int 
+            # as the database expects the hash to be a bigint (in a certain range)
+            self.__dbhash = int(hashlib.md5(self.__text).hexdigest()[0:15], 16) 
+            # at most 15 digits can be used because more digits would lead to an out-of-range bigint (database) 
+            # self.__dbhash = int('f'*15, 16)
+            # note that still this guaranties a good level of uniqueness 
+            # https://stackoverflow.com/questions/2510716/short-python-alphanumeric-hash-with-minimal-collisions
+        
         return self.__dbhash
     
+
     def writetodb(self, dbconn):
         """
             Writes this scenario to database returning the tuple scenario_id, isNew
@@ -244,9 +309,8 @@ class Scenario(dict):
         """
         scenario_hash = self.dbhash()
         
-        
         scenarios = dbconn.fetchall("select * from processing.scenarios where hash=%s;" , (scenario_hash,))
-        
+
         #the line above returns list objects. To return dict objects see
         #https://wiki.postgresql.org/wiki/Using_psycopg2_with_PostgreSQL
         #cursor.close()
@@ -274,7 +338,7 @@ class Scenario(dict):
 
         arg1 =  """INSERT INTO processing.scenarios ({0}) VALUES ({1});""" .format (dbkeys_str, db_str) 
         arg2 = tuple(dbvals)
-        
+
         dbconn.execute(arg1, arg2)
         dbconn.commit()
         

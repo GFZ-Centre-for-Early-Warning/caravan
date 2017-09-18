@@ -38,6 +38,9 @@ import mcerp
 import caravan.settings.globalkeys as gk
 import caravan.fdsnws_events as fe
 
+import os
+from caravan.settings.shared import events_folder_name
+
 from jinja2 import Template
 
 CaravanApp = miniwsgi.App()
@@ -128,13 +131,20 @@ def caravan_mainpage(request, response):
 
             with open("main_page_template.html", "rb") as f:
                 main_page_template =Template( f.read() )
-                
+
+
+            # the event_report is set so it could be retrieved via the web interface  
+            # please check that pathnames are the same in your enviroment 
+            event_report = os.path.join("/report", events_folder_name, str(scenario_hash), "report.pdf")
+            #print(event_report)
+
 
             return [ main_page_template.render(
                 viewmode="true",
                 session_id=session_id,
                 event_parameters=response.tojson(scenario_parameters, set_content_type=False)[0],
-                scenario_parameters=scenario_parameters
+                scenario_parameters=scenario_parameters,
+                event_report=event_report
             )]
 
     

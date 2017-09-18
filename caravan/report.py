@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# -* coding: utf-8 -*-
 import caravan.settings.globals as glb
+import os
 import codecs
 import numpy as np
-import os
 import pylatex
 import scipy
 import shapely.wkt
@@ -52,14 +52,18 @@ def generate_plot(impact_data,extent,epicentre,measure,fname,ptype='median'):
     #generate basemap
     extent = shapely.wkt.loads(extent[0][0]).bounds
     extent = bufferp(extent,10)
-    tick = max([round(round(abs(extent[0]-extent[2])/4,1)*2)/2,round(round(abs(extent[1]-extent[3])/4,1)*2)/2])
+    #tick = max([round(round(abs(extent[0]-extent[2])/4,1)*2)/2,round(round(abs(extent[1]-extent[3])/4,1)*2)/2])
+    tick = min([round(abs(extent[0]-extent[2])/4,1),round(abs(extent[1]-extent[3])/4,1)])
 
-    #etopo background
-    cmd='grdcut -R{}/{}/{}/{} etopo1_bedrock.nc -Getopo1.grd'.format(extent[0],extent[2],extent[1],extent[3])
+    #srtm background
+    #cmd='grdcut -R{}/{}/{}/{} etopo1_bedrock.nc -Getopo1.grd'.format(extent[0],extent[2],extent[1],extent[3])
+    cmd='grdcut -R{}/{}/{}/{} kyz.grd -Gkyz_cut.grd'.format(extent[0],extent[2],extent[1],extent[3])
     os.system(cmd)
-    cmd='grdgradient etopo1.grd -A45 -Ne0.5 -Getopo1_shadow.grd'
+    #cmd='grdgradient etopo1.grd -A45 -Ne0.5 -Getopo1_shadow.grd'
+    cmd='grdgradient kyz_cut.grd -A45 -Ne0.5 -Gkyz_shadow.grd'
     os.system(cmd)
-    cmd='grdimage etopo1.grd -Ctopo_water.cpt -R -JM5i -Y2i -B{}WSne -K > {}'.format(tick,fname)
+    #cmd='grdimage etopo1.grd -Ctopo_water.cpt -R -JM5i -Y2i -B{}WSne -K > {}'.format(tick,fname)
+    cmd='grdimage kyz_cut.grd -Ctopo_water.cpt -R -JM5i -Y2i -B{}WSne -K > {}'.format(tick,fname)
     os.system(cmd)
 
     #coastlines to mark continent
@@ -67,9 +71,9 @@ def generate_plot(impact_data,extent,epicentre,measure,fname,ptype='median'):
     os.system(cmd)
 
     #etopo background
-    cmd='grdimage etopo1.grd -Ctopo.cpt -J -R -O -K >> {}'.format(fname)
+    cmd='grdimage kyz_cut.grd -Ctopo.cpt -J -R -O -K >> {}'.format(fname)
     os.system(cmd)
-    cmd='grdimage etopo1.grd -Ietopo1_shadow.grd -Ctopo.cpt -J -R -K -O >> {}'.format(fname)
+    cmd='grdimage kyz_cut.grd -Ikyz_shadow.grd -Ctopo.cpt -J -R -K -O >> {}'.format(fname)
     os.system(cmd)
 
     #coastlines
@@ -210,74 +214,13 @@ def generate_plot(impact_data,extent,epicentre,measure,fname,ptype='median'):
     logarithmic=' '
     #if measure=='social':
     #    logarithmic=' -Q '
-    cmd='psscale -D2.5i/-0.4i/4i/.3ih -B:"{}":{}-C{}_colors.cpt -L0.0 -O >> {}'.format(label,logarithmic,measure,fname)
+    cmd='psscale -D2.5i/-0.4i/4i/.3ih -Ba1:"{}":{}-C{}_colors.cpt -O >> {}'.format(label,logarithmic,measure,fname)
+    print cmd
     os.system(cmd)
 
     #create pdf
     cmd="psconvert -A -P -Tf {}".format(fname)
     os.system(cmd)
-
-    #def connection(host=opts.DB_HOST, port=opts.DB_PORT, dbname=opts.DB_NAME, user=opts.DB_USER,  password=opts.DB_PSWD, async=opts.DB_ASYNC):
-   # #Create plot object
-   # ax = matplotlib.pyplot.subplot(111)
-   # matplotlib.pyplot.box(on=None)
-   # matplotlib.pyplot.savefig('plot.pdf')
-   # #extent
-   # extent = shapely.wkt.loads(extent[0][0]).bounds
-   # #increase size by 10 % at least plot (2 x 2 degrees)
-   # extent = bufferp(extent,10)
-   # #Basemap
-   # m = mpl_toolkits.basemap.Basemap(resolution='i', epsg=4326, projection='merc',
-   #         llcrnrlon=extent[0],llcrnrlat=extent[1],
-   #         urcrnrlon=extent[2],urcrnrlat=extent[3],
-   #         lat_ts=extent[1]+abs(extent[3]-extent[1])/2.
-   #         )
-   # m.etopo()
-   # m.drawcountries()
-   # m.drawmeridians(np.arange(extent[0],extent[2],.5))
-   # m.drawparallels(np.arange(extent[1],extent[3],.5))
-
-   # #create cmap and colors (depending on plot type)
-   # if (measure == 'gm'):
-   #     #4,5,6,7,8,9,10
-   #     #cmap = matplotlib.colors.ListedColormap(['#FFFF11','#FFD700','#FFAA00','#FF5500','#FF0000','#D00000','#A00000','#900000'])
-   #     cmap = matplotlib.colors.ListedColormap(['(255, 255, 17, 0.6)','(255, 215, 0, 0.6)','(255, 170, 0, 0.6)','(255, 85, 0, 0.6)','(255, 0, 0, 0.6)','(208, 0, 0, 0.6)','(160, 0, 0, 0.6)','(144, 0, 0, 0.6)'])
-   #     idx = 2
-   # elif (measure == 'social'):
-   #     #0,1,10,20,50,100,200,500,1000
-#  #      cmap = matplotlib.colors.ListedColormap(['#008000','#FFD700','#FF4500','#FF0000','#E00000','#CC0000','#CC0000','#CC0000','#CC0000','#CC0000'])
-   #     cmap = matplotlib.colors.ListedColormap([(0, 128, 0, 0.6), (255, 215, 0, 0.6), (255, 69, 0, 0.6), (255, 0, 0, 0.6), (224, 0, 0, 0.6), (204, 0, 0, 0.6), (204, 0, 0, 0.6), (204, 0, 0, 0.6), (204, 0, 0, 0.6), (204, 0, 0, 0.6)])
-
-
-   #     idx = 3
-   # elif (measure == 'economic'):
-   #     #idx = 4
-   #     pass
-   # else:
-   #     pass
-
-   # #assign colors for drawing polygons
-   # if (ptype=='median'):
-   #     idx_type=-1
-   # else:
-   #     pass
-   # colors = [cmap(row[idx][idx_type]/cmap.N) for row in impact_data]
-
-
-   # #create polygons for geocells
-   # wkt_polygons = [list(shapely.wkt.loads(row[0]).exterior.coords) for row in impact_data]
-   # polygons=[]
-   # for l in wkt_polygons:
-   #     #convert coordinates to map coordinates (shouldn't be necessary usually)
-   #     polygons.append(np.array([m(point[0],point[1]) for point in l]))
-   # lines = matplotlib.collections.LineCollection(polygons)
-   # #assign colors
-   # lines.set_facecolors(colors)
-   # lines.set_edgecolors("#808080")
-   # lines.set_linewidth(1)
-   # #add the polygons to the plot
-   # ax.add_collection(lines)
-   # matplotlib.pyplot.savefig(fname)
 
 def generate_barplot(impact_data,locations_data,measure,fname):
     '''
@@ -365,6 +308,7 @@ def report(session_id):
     old_cwd = os.getcwd() #for changing back at the end
     new_cwd = os.path.dirname(os.path.realpath(__file__))+'/static/report/'
     os.chdir(new_cwd)
+    print os.getcwd()
     ###########
     #gather data
     ###########
@@ -598,7 +542,7 @@ def report(session_id):
     fat_sorted = [data[i] for i in sort_order]
     fat_pop = [fat_by_loc[i][2] for i in range(n)]
     roman_numerals = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII']
-    fat_int = [roman_numerals[int(round(row[3][-1]))] for row in rows]
+    fat_int = [int(round(row[3][-1])) for row in rows]
 
     #total sum of median fatalities
     fat_tot = sum([float(row[4]) for row in fat_by_loc])
@@ -608,120 +552,55 @@ def report(session_id):
     fat_tot = str(fat_range[idx])+'-'+str(fat_range[idx+1])
 
 
-    extent = conn.fetchall("""SELECT ST_AsText(ST_Extent((ST_Transform(G.the_geom,4326)))) as bb
+    extent_gm = conn.fetchall("""SELECT ST_AsText(ST_Extent((ST_Transform(G.the_geom,4326)))) as bb
             FROM
             processing.ground_motion as GM
             LEFT JOIN
             exposure.geocells as G ON (G.gid = GM.geocell_id)
             WHERE
             GM.session_id=%s;""",(session_id,))
+    
+    extent_social = conn.fetchall("""SELECT ST_AsText(ST_Extent((ST_Transform(G.the_geom,4326)))) as bb
+            FROM
+            risk.social_conseq as S
+            LEFT JOIN
+            exposure.geocells as G ON (G.gid = S.geocell_id)
+            WHERE
+            S.session_id=%s AND S.fatalities_prob_dist[10] > 0;""",(session_id,))
+           # S.session_id=%s AND \'{1,0,0,0,0,0,0}\' <>S.fatalities_prob_dist;""",(session_id,[1.,0.,0.,0.,0.,0.,0.]))
+    
+    #set to ground motion extent if no fatalities
+    print(extent_social)
+    if len(extent_social)==0:
+	    extent_social = extent_gm
+    
+    fat_by_loc = conn.fetchall("""SELECT
+        t.geocell_id,
+        ST_AsText(t.the_geom) as geom,
+        Round(t.pop_density[array_length(t.pop_density,1)]*t.geocell_area) as pop,
+        GM.ground_motion,
+        r.fatalities_prob_dist[array_upper(r.fatalities_prob_dist,1)] AS fat
+        FROM
+        processing.ground_motion as GM
+        LEFT JOIN
+        exposure.targets AS t ON (t.geocell_id=GM.geocell_id)
+        LEFT JOIN
+        risk.social_conseq AS r ON (r.geocell_id = GM.geocell_id and r.session_id = GM.session_id)
+        WHERE
+        GM.session_id=%s
+        ORDER BY fat DESC;""",(session_id,))
 
     conn.close()
     #################
     # Create plots
     #################
-    generate_plot(impact,extent,[event_lon[0],event_lat[0]],'gm','gm.ps','median')
-    generate_plot(impact,extent,[event_lon[0],event_lat[0]],'social','social.ps','median')
-    generate_barplot(impact,locations,'gm','gm_barplot.ps')
+    generate_plot(impact,extent_gm,[event_lon[0],event_lat[0]],'gm',new_cwd+'/gm.ps','median')
+    generate_plot(impact,extent_social,[event_lon[0],event_lat[0]],'social',new_cwd+'/social.ps','median')
+    generate_barplot(impact,locations,'gm',new_cwd+'/gm_barplot.ps')
 
     #################
     # Compose document
     #################
-    #doc = pylatex.Document()
-    #doc.packages.append(pylatex.Package('gensymb'))
-
-    #with doc.create(pylatex.Section('Caravan Earthquake Scenario Report')):
-    #    doc.append('A preliminary assessment of expected loss is provided in the following.')
-    #    #Event information
-    #    with doc.create(pylatex.Subsection('Earthquake scenario')):
-    #        doc.append('The event occured at {:3.2f}+/-{:3.2f} latitude '.format(event_lat[0],event_lat[1]))
-    #        doc.append('and {:3.2f}+/-{:3.2f} longitude, '.format(event_lon[0],event_lon[1]))
-    #        doc.append('at a depth of {:3.2f}+/-{}km. '.format((event_z[0]+event_z[1])/2.,abs(event_z[0]-event_z[1])/2.))
-    #        doc.append('The assigned magnitude is Mw {:2.1f}+/-{:2.1f}. '.format((event_mag[0]+event_mag[1])/2.,abs(event_mag[0]-event_mag[1])/2.))
-    #        if event_fault!='':
-    #            doc.append('Assumed style of faulting is {} with dip {:3.2f}+/-{:3.2f} and strike {:3.2f}+/-{:3.2f}'.format(event_fault,(event_dip[0]+event_dip[1])/2.,abs(event_dip[0]-event_dip[1])/2.,(event_strike[0]+event_strike[1])/2.,abs(event_strike[0]-event_strike[1])/2.))
-    #        #round inhabitants
-    #        inhab = locations[0][2]
-    #        #select magnitude order for rounding (one less than value at least 10)
-    #        size=max(10,10**(int(np.log10(inhab))-1))
-    #        diff=abs(size-inhab%size)
-    #        inhab = inhab + (-1*(inhab%size<size/2.)+(1-(inhab%size<size/2.)))*diff
-    #        doc.append('The largest affected settlement is geocell_id {} with about {} inhabitants. The median ground motion in macroseimic intensity (EMS-98) has been estimated using the {} IPE as shown in Fig.1.'.format(locations[0][0],int(inhab),event_gmpe))
-
-    #        #ground motion plot
-    #        with doc.create(pylatex.Figure(position='h!')) as gm_plot:
-    #            gm_plot.add_image('gm.pdf',width='12cm')
-    #            gm_plot.add_caption('Estimated median macroseismic intensity')
-    #        #further info
-    #        roman_numerals = ['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII']
-    #        doc.append('The maximum intensity, observed in geocell_id {} (usually in correspondence of the epicentre), is {}. The area where the earthquake could have been felt is approximately {:d} qkm .'.format(maximum_intensity[0],roman_numerals[maximum_intensity[1]],int(round(area[0][0]/10)*10)))
-    #        doc.append('The maximum macroseismic intensity distribution for the largest affected settlement geocell_id {} can be seen in Fig.2. '.format(locations[0][0]))
-    #        doc.append('Table 2 lists the median intensity expected in the {} largest affected settlements.'.format(n))
-    #        #ground motion distribution largest settlement
-    #        with doc.create(pylatex.Figure(position='h!')) as loc_gm_plot:
-    #            loc_gm_plot.add_image('gm_barplot.pdf',width='8cm')
-    #            loc_gm_plot.add_caption('Estimated macroseismic intensity distribution')
-
-    #    #Exposure info
-    #    with doc.create(pylatex.Subsection('Earthquake scenario')):
-    #        doc.append('The affected region can be characterized as {}.'.format(affect_descr))
-    #        doc.append('Table 1 shows the {} dominant residential building types in the target area and their relative percentage alongside their most likely vulnerability class.'.format(m))
-    #        doc.append('The population has been disaggregated based on the relative frequencies and expected occupation of the residential buildings, in order to compute the estimated number of buildings.')
-    #        #building types
-    #        with doc.create(pylatex.Tabular('c|c|c')) as table1:
-    #            table1.add_hline()
-    #            table1.add_row(('EMCA-GEM Building Type','Relative','Most likely vulnerability'))
-    #            table1.add_hline()
-    #            for i in range(len(exposure_bt)):
-    #                table1.add_row((exposure_bt[i],round(exposure_freq[i],2),exposure_vc[i]))
-    #            table1.add_hline()
-    #            #table1.add_caption('Building type distribution and vulnerability classes')
-
-
-    #    with doc.create(pylatex.Subsection('Vulnerability and expected fatalities')):
-    #        #format vc string
-    #        vc_string = set(exposure_vc)
-    #        if len(vc_string) == 1:
-    #            vc_string = ' '+str(vc_string)
-    #        elif len(vc_string) == 2:
-    #            vc_string = 'es '+' and '.join(vc_string)
-    #        else:
-    #            vc_string = ', '.join(exposure_vc[:-1])+' and '+exposure_vc[-1]
-    #        doc.append('As we see from Table 1 the buildings within the region are mainly of vulnerability class{} .'.format(vc_string))
-    #        doc.append('Figure 3 shows the expected distribution of casualties as forecasted by the CARAVAN system.')
-    #        doc.append('The sum of the median expected fatalities over the whole area is {}.'.format(fat_tot))
-    #        doc.append('Table 2 shows the most likely order of magnitude of fatalities in the {} largest settlements in the affected area, the estimated population, and the estimated macroseismic intensity.'.format(n))
-    #        #loss plot
-    #        with doc.create(pylatex.Figure(position='h!')) as gm_plot:
-    #            gm_plot.add_image('social.pdf',width='12cm')
-    #            gm_plot.add_caption('Estimated median macroseismic intensity')
-    #        #loss table
-    #        with doc.create(pylatex.Tabular('c|c|c|c')) as table2:
-    #            table2.add_hline()
-    #            table2.add_row(('Geocell id','Expected casualties','Estimated population','Estimated intensity'))
-    #            table2.add_hline()
-    #            for i in range(len(fat_order)):
-    #                table2.add_row((fat_order[i],fat_sorted[i],int(fat_pop[i]),fat_int[i]))
-    #            table2.add_hline()
-    #            #table2.add_caption('Most likely number of fatalities, inhabitants and median macroseismic intensity for the {} most affected geocells'.format(n))
-
-    #        #disclaimer
-    #    with doc.create(pylatex.Subsection('Disclaimer')):
-    #        doc.append("REWORD-COPY PASTE FROM PAGER CARAVAN results are usually available shortly after an event. ")
-    #        doc.append("However, information on the extent of shaking will be uncertain in the minutes and hours following and earthquake and typically improves as additional data are available.")
-    #        doc.append("CARAVAN is regularly updated and users of CARAVAN hazard and loss estimates should account for uncertainty and always seek the most current CARAVAN release for any earthquake.")
-    #        doc.append("There will be infrequent cases where the CARAVAN estimates will be inaccurate, and even outside the stated range of the postulated uncertainties.")
-    #        doc.append("Population exposure is uncertain and varies by time of day, but these variations are not globally available so they are not currently considered for loss estimates in CARAVAN.")
-    #        doc.append("In addition, CARAVAN model loss calculations are approximate and may be inaccurate for some regions.")
-    #        doc.append("The uncertainties estimated for a given earthquake and for a particular CARAVAN version do not necessarily account for all the uncertainty associated with the estimated losses.")
-    #        doc.append("Potential errors or additional uncertainties in magnitude, location, depth, and shaking characteristics maybe not modeled explicitly and may remain unaccounted for in the CARAVAN loss-estimate ranges.")
-    #        doc.append("CARAVAN loss estimates also do not include losses due to tsunami or other secondary hazards (such as fire, liquefaction, and landsliding).")
-    #        doc.append("The CARAVAN system also does not completely account for aftershocks that may add to damage and losses.")
-    #        doc.append("Users of CARAVAN products should understand the potential uncertainties and or inaccuracies associated with CARAVAN's rapid loss-estimation capability: Individual or institutional users should use their own judgment and seek additional sources of information or advice before any decision making.")
-
-    #create the report
-    #doc.generate_pdf('full', clean_tex=False)
-
     #use jinja
     latex_jinja_env = jinja2.Environment(
         block_start_string = '\BLOCK{',
@@ -737,7 +616,7 @@ def report(session_id):
         loader = jinja2.FileSystemLoader(os.path.abspath('.'))
     )
     template = latex_jinja_env.get_template('report-template.tex')
-    filehandle=open('report.tex','w')
+    filehandle=open('./report.tex','w')
     filehandle.write(template.render(lat         = '{:3.2f}'.format(    event_lat[0]                          ),
                                      lat_err     = '{:3.2f}'.format(    event_lat[1]                          ),
                                      lon         = '{:3.2f}'.format(    event_lon[0]                          ),

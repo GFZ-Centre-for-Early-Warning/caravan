@@ -26,6 +26,7 @@ __date__ ="$Aug 20, 2014 2:56:26 PM$"
 from mcerp.umath import exp, sqrt, log, log10
 from gmpe_utils import distance as greatarc_dist, deg2km, chorddistance
 import mcerp
+import warnings
 
 def _threed_dist(lat1, lon1, depth1, lat2, lon2, depth2):
     """
@@ -262,7 +263,8 @@ class Gmpe(object):
             raise Exception('{0} error: missing magnitude'.format(self.__repr__()))
         
         if self.m > self.m_bounds[1] or self.m < self.m_bounds[0]:
-            raise Exception("{0} error: magnitude not in {1}".format(self.__repr__(), str(list(self.m_bounds) ) )) #because list str is like closed interval in math
+            #raise Exception("{0} error: magnitude not in {1}".format(self.__repr__(), str(list(self.m_bounds) ) )) #because list str is like closed interval in math
+            warnings.warn("{0} warning: magnitude not in defined range {1}".format(self.__repr__(), str(list(self.m_bounds) ) )) #because list str is like closed interval in math
         
         
         #add spf if slip is present and not sof
@@ -280,7 +282,7 @@ class Gmpe(object):
         try:
             import warnings
             with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
+                #warnings.simplefilter("ignore")
                 self(self.lat, self.lon)
         except Exception as e:
             import traceback
@@ -305,7 +307,8 @@ class Gmpe(object):
             if epidist > self.d_bounds[1] or epidist < self.d_bounds[0]:
                 
                 
-                raise Exception("{0} error: unable to calculate intensity at (lat={1:f}, lon={2:f}), epicentral distance ({3:f}) not in {4}".
+                #raise Exception("{0} error: unable to calculate intensity at (lat={1:f}, lon={2:f}), epicentral distance ({3:f}) not in {4}".
+                warnings.warn("{0} warning: out of defined bound while calculating intensity at (lat={1:f}, lon={2:f}), epicentral distance ({3:f}) not in {4}".
                     format(self.__repr__(), args[0], args[1], epidist, str(list(self.d_bounds)) )) #because list str is like closed interval in math
         
         distance = self.distance(args[0], args[1]) if l == 2 else args[0] if l == 1 else None

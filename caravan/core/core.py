@@ -142,9 +142,10 @@ def caravan_run(input_event):
         
         scenario_id , isnew = scenario.writetodb(conn)
         
+
         if not isnew:
             #arg1 = """DELETE FROM processing.ground_motion WHERE scenario_id=%d """ % scenario_id
-            arg1 = """DELETE FROM processing.ground_motion WHERE scenario_id=%s"""
+            #arg1 = """DELETE FROM processing.ground_motion WHERE scenario_id=%s"""
             
             #From see http://www.postgresql.org/docs/9.1/static/sql-delete.html:
             #we could write "DELETE FROM processing.ground_motion WHERE scenario_id=%d RETURNING COUNT(*)""" % scenario_id
@@ -157,14 +158,29 @@ def caravan_run(input_event):
             #ANOTHER NICER EXAMPLE found here: http://stackoverflow.com/questions/2251567/how-to-get-the-number-of-deleted-rows-in-postgresql
             #AS LONG AS THE CONNECTION IS NOT IN ASYNC MODE (we can switch it to sync here. It must be async inside each apply_async call below only)
             #USES psycopg2 cursor class and is preferable. Therefore:
-            cursor = conn.cursor(arg1, (scenario_id,))
-            conn.commit() #NOTE: in async mode does nothing
-            rows_deleted = cursor.rowcount
-            cursor.close()
+            #cursor = conn.cursor(arg1, (scenario_id,))
+            #conn.commit() #NOTE: in async mode does nothing
+            #rows_deleted = cursor.rowcount
+            #cursor.close()
             #this works because (psycopg2 cursor doc) a QUERY was executed in execute(). Now, delete seems not a query to me,
             #however it seems to work
             
-            runinfo.msg("Using already stored Scenario (hash={0:d}), deleted {1:d} previously calculated cells" .format(scenario.dbhash(),rows_deleted))
+            # if an already-simulated scenario is supplied simulation is skipped
+
+            session_id = conn.fetchall( "select * from processing.sessions where scenario_id=%s;", (scenario_id,) )[-1][0] 
+            
+            runinfo.msg("Using already stored Scenario (hash={0:d}), skipping simulation".format(scenario.dbhash()))
+            
+            # faking a completed simulation, so the inteface will the inteface will go to the next step and query the results of the simulation
+            # note that these two functions where added to the to RunInfo object for that purpose, see caravan/core/runutils.py 
+            runinfo.setsession_id(session_id)
+            runinfo.setstatus(2)
+            
+            # closing connection to database and returning 
+            if conn is not None:
+                conn.close()
+
+            return runinfo
         else:
             runinfo.msg("Written new scenario to databse (hash={0:d}):<br>Scenario = {1}".format(scenario.dbhash(),scenario.dbstr()))
                 
