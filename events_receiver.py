@@ -109,6 +109,13 @@ def main():
     if not os.path.isdir(events_folder): 
         os.makedirs(events_folder)
 
+        # creating also a link to the events_folder in "./caravan/static/report/" (works on my machine), 
+        # caravan_wsgi and the main_page_template will be modified accordingly, so that the report could be retrieved 
+        os.symlink(
+            events_folder, 
+            os.path.join("./caravan/static/report", events_folder_name)
+        )
+
 
     while True:
         events = source.recv()
